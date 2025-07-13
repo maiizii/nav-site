@@ -1,11 +1,39 @@
 let allLinks = [];
 let allCategories = [];
-let allTags = [];
 let currentTag = '';
 let currentSearch = '';
 
+function createTooltip() {
+  let tooltip = document.getElementById('nav-tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'nav-tooltip';
+    tooltip.className = 'nav-tooltip';
+    document.body.appendChild(tooltip);
+  }
+  return tooltip;
+}
+
+function showTooltip(text, event) {
+  const tooltip = createTooltip();
+  tooltip.innerHTML = text.replace(/\n/g, '<br>');
+  tooltip.style.display = 'block';
+  const padding = 14;
+  let left = event.clientX + padding;
+  let top = event.clientY + padding;
+  const rect = tooltip.getBoundingClientRect();
+  if (left + rect.width > window.innerWidth) left = window.innerWidth - rect.width - padding;
+  if (top + rect.height > window.innerHeight) top = window.innerHeight - rect.height - padding;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function hideTooltip() {
+  const tooltip = document.getElementById('nav-tooltip');
+  if (tooltip) tooltip.style.display = 'none';
+}
+
 function renderTags() {
-  // 标签区，实际用 category 实现（如有 tags 字段可提取 tags）
   const tagsBar = document.getElementById('tags');
   tagsBar.innerHTML = '';
   allCategories.forEach(cate => {
@@ -35,7 +63,6 @@ function renderTags() {
 function renderLinks(links) {
   const main = document.getElementById('main');
   main.innerHTML = '';
-  // 按 category 分组
   const groups = {};
   links.forEach(link => {
     const cat = link.category || '未分组';
@@ -62,6 +89,14 @@ function renderLinks(links) {
           <p>${link.description || ''}</p>
         </a>
       `;
+      // 浮动描述块事件
+      card.onmouseenter = function(e) {
+        if (link.description) showTooltip(link.description, e);
+      };
+      card.onmousemove = function(e) {
+        if (link.description) showTooltip(link.description, e);
+      };
+      card.onmouseleave = hideTooltip;
       navList.appendChild(card);
     });
     main.appendChild(section);
@@ -77,7 +112,6 @@ async function loadAllLinks() {
   }
   const resp = await fetch(url);
   allLinks = await resp.json();
-  // 提取所有分类
   allCategories = Array.from(new Set(allLinks.map(l => l.category).filter(Boolean)));
 }
 
@@ -87,12 +121,10 @@ async function loadAndRenderLinks() {
   renderLinks(allLinks);
 }
 
-// 搜索事件
 document.getElementById('search').oninput = e => {
   currentSearch = e.target.value.trim();
   currentTag = '';
   loadAndRenderLinks();
 };
 
-// 初始加载
 loadAndRenderLinks();
