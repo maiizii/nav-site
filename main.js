@@ -99,12 +99,14 @@ function renderLinks(links) {
     items.forEach(link => {
       const card = document.createElement('div');
       card.className = 'nav-card';
+      // 如果有 icon，则显示图片；如果没有 icon，则渲染一个不可见占位 span
       card.innerHTML = `
         <a href="${link.url}" target="_blank" rel="noopener">
-          <img src="${link.icon ? link.icon : 'https://tkcall.com/favicon.ico'}"
-               alt="icon"
-               class="nav-icon"
-               onerror="this.src='https://tkcall.com/favicon.ico';">
+          ${
+            link.icon
+              ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none';">`
+              : `<span class="nav-icon" style="visibility:hidden;"></span>`
+          }
           <div class="nav-card-content">
             <div class="nav-title">${link.title}</div>
             <div class="nav-desc">${link.description || ''}</div>
