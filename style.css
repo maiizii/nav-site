@@ -148,19 +148,21 @@ main {
   margin: 0;
   margin-left: 7px;
   flex: 1;
+  max-width: 140px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 140px;
-  text-align: center;
+  text-align: left;
   display: flex;
   align-items: center; /* 垂直居中 */
-  justify-content: center; /* 水平居中 */
+  /* 省略号在前方显示，优先显示结尾内容 */
+  direction: rtl;
+  unicode-bidi: plaintext;
 }
 
-/* 正确的浮层和箭头实现 */
+/* 浮层与箭头（绝对定位，内容padding不挤压文字） */
 .nav-tooltip {
-  position: absolute; /* 必须absolute，不要relative */
+  position: absolute;
   z-index: 9999;
   min-width: 220px;
   max-width: 360px;
@@ -181,14 +183,14 @@ main {
 }
 
 .nav-tooltip-content {
-  padding: 18px 18px;
+  padding: 16px 18px;
   text-align: center;
   font-size: 1.08em;
   color: #443;
   word-break: break-all;
 }
 
-/* 箭头父容器必须absolute，且浮层要有padding-top或padding-bottom留出箭头空间 */
+/* 纯白三角箭头，无特效 */
 .nav-tooltip-arrow {
   position: absolute;
   left: 50%;
@@ -199,17 +201,17 @@ main {
   pointer-events: none;
 }
 
-/* 下方浮层，箭头底部贴浮层顶部 */
+/* 下方浮层，箭头顶部与浮层顶部重合 */
 .nav-tooltip-down .nav-tooltip-arrow {
-  top: -14px;
+  top: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
   border-bottom: 14px solid #fff;
 }
 
-/* 上方浮层，箭头顶部贴浮层底部 */
+/* 上方浮层，箭头底部与浮层底部重合 */
 .nav-tooltip-up .nav-tooltip-arrow {
-  bottom: -14px;
+  bottom: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
   border-top: 14px solid #fff;
