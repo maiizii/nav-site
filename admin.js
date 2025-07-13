@@ -1,94 +1,114 @@
-// API基础路径
 const API = '/api/nav-links';
 
-// Tab切换
-document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(el => {
-  el.addEventListener('click', function(e) {
-    e.preventDefault();
-    let tab = el.getAttribute('data-tab');
-    document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(a => a.classList.remove('active'));
-    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector('.admin-menu-link[data-tab="'+tab+'"]').classList.add('active');
-    document.querySelector('.admin-sidebar-item[data-tab="'+tab+'"]').classList.add('active');
-    document.getElementById('tab-' + tab).classList.add('active');
-  });
-});
-
-// 导航列表渲染
+// 渲染导航列表（表格+编辑）
 async function loadNavLinks() {
   const res = await fetch(API);
   const links = await res.json();
-  renderNavLinks(links);
+  renderNavTable(links);
 }
 
-function renderNavLinks(list) {
+// 渲染表格
+function renderNavTable(list) {
   const navList = document.getElementById('nav-list');
-  navList.innerHTML = '';
+  navList.innerHTML = `
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>名称</th>
+          <th>链接</th>
+          <th>分类</th>
+          <th>描述</th>
+          <th>图标</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="nav-tbody"></tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          <td><input type="text" id="add-title" placeholder="网站名称" required /></td>
+          <td><input type="url" id="add-url" placeholder="链接" required /></td>
+          <td><input type="text" id="add-category" placeholder="分类" required /></td>
+          <td><input type="text" id="add-description" placeholder="描述" /></td>
+          <td><input type="text" id="add-icon" placeholder="图标链接" /></td>
+          <td>
+            <button id="add-btn">新增</button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  `;
+  const tbody = document.getElementById('nav-tbody');
   list.forEach(nav => {
-    let li = document.createElement('li');
-    li.innerHTML = `
-      <span>
-        <img src="${nav.icon || 'https://cdn.tkcall.com/original/1X/e71ad477c92f1bb9b32ce24bdc8d57ad0dd4fa97.png'}"
-          style="width:22px;height:22px;vertical-align:middle;margin-right:7px;border-radius:6px;border:1px solid #edf3ee;">
-        ${nav.title} <a href="${nav.url}" target="_blank" style="color:#1ca57d;text-decoration:underline;margin-left:8px;">${nav.url}</a>
-        <span style="color:#888;font-size:0.98em;margin-left:10px;">[${nav.category}]</span>
-        <span style="color:#888;font-size:0.98em;margin-left:10px;">${nav.description || ''}</span>
-      </span>
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${nav.id}</td>
+      <td><input type="text" value="${nav.title}" id="title-${nav.id}" /></td>
+      <td><input type="url" value="${nav.url}" id="url-${nav.id}" /></td>
+      <td><input type="text" value="${nav.category || ''}" id="category-${nav.id}" /></td>
+      <td><input type="text" value="${nav.description || ''}" id="desc-${nav.id}" /></td>
+      <td><input type="text" value="${nav.icon || ''}" id="icon-${nav.id}" /></td>
+      <td>
+        <button class="save-btn" data-id="${nav.id}">保存</button>
+        <button class="del-btn" data-id="${nav.id}">删除</button>
+      </td>
     `;
-    let actions = document.createElement('span');
-    actions.className = 'admin-list-actions';
-    // 编辑
-    let editBtn = document.createElement('button');
-    editBtn.textContent = '编辑';
-    editBtn.onclick = async function() {
-      let title = prompt('名称', nav.title);
-      let url = prompt('链接', nav.url);
-      let category = prompt('分类', nav.category);
-      let description = prompt('描述', nav.description || '');
-      let icon = prompt('图标', nav.icon || '');
-      if (title && url) {
-        await fetch(API + '/' + nav.id, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, url, category, description, icon })
-        });
-        loadNavLinks();
-      }
-    };
-    // 删除
-    let delBtn = document.createElement('button');
-    delBtn.textContent = '删除';
-    delBtn.onclick = async function() {
-      if (confirm('确定删除 "' + nav.title + '" ？')) {
-        await fetch(API + '/' + nav.id, { method: 'DELETE' });
-        loadNavLinks();
-      }
-    };
-    actions.appendChild(editBtn);
-    actions.appendChild(delBtn);
-    li.appendChild(actions);
-    navList.appendChild(li);
+    tbody.appendChild(tr);
   });
-}
 
-// 添加导航
-document.getElementById('add-nav-form').addEventListener('submit', async function(e){
-  e.preventDefault();
-  let title = document.getElementById('nav-title').value.trim();
-  let url = document.getElementById('nav-url').value.trim();
-  let category = document.getElementById('nav-category').value.trim();
-  let description = document.getElementById('nav-description').value.trim();
-  let icon = document.getElementById('nav-icon').value.trim();
-  if (title && url) {
+  // 行编辑保存
+  document.querySelectorAll('.save-btn').forEach(btn => {
+    btn.onclick = async function() {
+      const id = btn.dataset.id;
+      const title = document.getElementById(`title-${id}`).value.trim();
+      const url = document.getElementById(`url-${id}`).value.trim();
+      const category = document.getElementById(`category-${id}`).value.trim();
+      const description = document.getElementById(`desc-${id}`).value.trim();
+      const icon = document.getElementById(`icon-${id}`).value.trim();
+      if (!title || !url) return alert('名称和链接必填');
+      await fetch(`${API}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, url, category, description, icon })
+      });
+      loadNavLinks();
+    };
+  });
+
+  // 删除
+  document.querySelectorAll('.del-btn').forEach(btn => {
+    btn.onclick = async function() {
+      const id = btn.dataset.id;
+      if (confirm('确定删除？')) {
+        await fetch(`${API}/${id}`, { method: 'DELETE' });
+        loadNavLinks();
+      }
+    };
+  });
+
+  // 新增
+  document.getElementById('add-btn').onclick = async function() {
+    const title = document.getElementById('add-title').value.trim();
+    const url = document.getElementById('add-url').value.trim();
+    const category = document.getElementById('add-category').value.trim();
+    const description = document.getElementById('add-description').value.trim();
+    const icon = document.getElementById('add-icon').value.trim();
+    if (!title || !url) return alert('名称和链接必填');
     await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, url, category, description, icon })
     });
+    // 清空输入
+    document.getElementById('add-title').value = '';
+    document.getElementById('add-url').value = '';
+    document.getElementById('add-category').value = '';
+    document.getElementById('add-description').value = '';
+    document.getElementById('add-icon').value = '';
     loadNavLinks();
-    this.reset();
-  }
-});
+  };
+}
 
 // 初始化
 loadNavLinks();
