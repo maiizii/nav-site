@@ -1,6 +1,6 @@
 // 加载导航数据并渲染
 async function loadNavLinks() {
-  const resp = await fetch('/api/nav-links');
+  const resp = await fetch('/nav-links');
   const navLinks = await resp.json();
 
   const navList = document.getElementById('nav-list');
