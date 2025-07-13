@@ -4,7 +4,6 @@ let currentCategory = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// 色块
 const colorPalette = [
   "#88af8e", "#41e254", "#f8745c", "#fa6c8d", "#d4efd8", "#edf3ee"
 ];
@@ -24,7 +23,53 @@ function padCategoryName(cat) {
   return cat.padEnd(4, ' ');
 }
 
-// 左侧分类栏渲染
+// 浮动注释卡片
+function createTooltip() {
+  let tooltip = document.getElementById('nav-tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'nav-tooltip';
+    tooltip.className = 'nav-tooltip';
+    document.body.appendChild(tooltip);
+  }
+  return tooltip;
+}
+function showTooltip(text, card) {
+  const tooltip = createTooltip();
+  tooltip.innerHTML = `
+    <div class="nav-tooltip-arrow"></div>
+    <div class="nav-tooltip-content">${text.replace(/\n/g, '<br>')}</div>
+  `;
+  tooltip.style.display = 'block';
+
+  setTimeout(() => {
+    const cardRect = card.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const scrollX = window.scrollX || document.documentElement.scrollLeft;
+    let top, left;
+    const spaceBelow = window.innerHeight - cardRect.bottom;
+    if (spaceBelow > tooltipRect.height + 18) {
+      top = cardRect.bottom + 8 + scrollY;
+      tooltip.classList.remove('nav-tooltip-up');
+      tooltip.classList.add('nav-tooltip-down');
+    } else {
+      top = cardRect.top - tooltipRect.height - 8 + scrollY;
+      tooltip.classList.remove('nav-tooltip-down');
+      tooltip.classList.add('nav-tooltip-up');
+    }
+    left = cardRect.left + cardRect.width / 2 - tooltipRect.width / 2 + scrollX;
+    left = Math.max(10, Math.min(left, window.innerWidth - tooltipRect.width - 10));
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+  }, 0);
+}
+function hideTooltip() {
+  const tooltip = document.getElementById('nav-tooltip');
+  if (tooltip) tooltip.style.display = 'none';
+}
+
+// 分类栏渲染
 function renderCategories() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
@@ -96,6 +141,16 @@ function renderLinks(links) {
           </div>
         </a>
       `;
+      // 悬浮注释
+      card.onmouseenter = function() {
+        if (link.description) {
+          clearTimeout(tooltipTimer);
+          showTooltip(link.description, card);
+        }
+      };
+      card.onmouseleave = function() {
+        tooltipTimer = setTimeout(hideTooltip, 80);
+      };
       navList.appendChild(card);
     });
     main.appendChild(section);
@@ -104,7 +159,6 @@ function renderLinks(links) {
 
 // 分类、数据初始化
 async function loadAllLinks() {
-  // 你自己的接口，这里用静态json演示
   const resp = await fetch('/api/nav-links');
   allLinks = await resp.json();
   allCategories = Array.from(new Set(allLinks.map(l => l.category).filter(Boolean)));
