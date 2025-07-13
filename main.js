@@ -4,12 +4,20 @@ let currentTag = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// TKCall主题9主色系循环
-const colors = ["#3a6cf6", "#ff9800", "#4caf50", "#8f5ad5", "#ff5b5b", "#00bcd4"];
+// 色块色值同步TKCall调色板
+// 绿色：#88af8e（第三/强调色）  灰绿：#d4efd8（突出显示）  红：#f8745c  绿：#41e254  粉：#fa6c8d  浅灰：#edf3ee
+const colorPalette = [
+  "#88af8e", // 强调
+  "#41e254", // 成功
+  "#f8745c", // 危险
+  "#fa6c8d", // 爱
+  "#d4efd8", // 突出显示
+  "#edf3ee"  // 选中、活跃选定
+];
 function getColorByTitle(title) {
-  if (!title) return colors[0];
+  if (!title) return colorPalette[0];
   const code = title.charCodeAt(0);
-  return colors[code % colors.length];
+  return colorPalette[code % colorPalette.length];
 }
 
 function createTooltip() {
