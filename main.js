@@ -99,13 +99,13 @@ function renderLinks(links) {
     items.forEach(link => {
       const card = document.createElement('div');
       card.className = 'nav-card';
-      // 如果有 icon，则显示图片；如果没有 icon，则渲染一个不可见占位 span
+      // 图标优先显示图片，否则显示首字母色块
       card.innerHTML = `
         <a href="${link.url}" target="_blank" rel="noopener">
           ${
             link.icon
               ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none';">`
-              : `<span class="nav-icon" style="visibility:hidden;"></span>`
+              : `<span class="nav-icon-default">${(link.title || '').charAt(0).toUpperCase()}</span>`
           }
           <div class="nav-card-content">
             <div class="nav-title">${link.title}</div>
