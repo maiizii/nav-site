@@ -1,18 +1,12 @@
 let allLinks = [];
 let allCategories = [];
-let currentTag = '';
+let currentCategory = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// 色块色值同步TKCall调色板
-// 绿色：#88af8e（第三/强调色）  灰绿：#d4efd8（突出显示）  红：#f8745c  绿：#41e254  粉：#fa6c8d  浅灰：#edf3ee
+// TKCall色块
 const colorPalette = [
-  "#88af8e", // 强调
-  "#41e254", // 成功
-  "#f8745c", // 危险
-  "#fa6c8d", // 爱
-  "#d4efd8", // 突出显示
-  "#edf3ee"  // 选中、活跃选定
+  "#88af8e", "#41e254", "#f8745c", "#fa6c8d", "#d4efd8", "#edf3ee"
 ];
 function getColorByTitle(title) {
   if (!title) return colorPalette[0];
@@ -20,90 +14,57 @@ function getColorByTitle(title) {
   return colorPalette[code % colorPalette.length];
 }
 
-function createTooltip() {
-  let tooltip = document.getElementById('nav-tooltip');
-  if (!tooltip) {
-    tooltip = document.createElement('div');
-    tooltip.id = 'nav-tooltip';
-    tooltip.className = 'nav-tooltip';
-    document.body.appendChild(tooltip);
-  }
-  return tooltip;
-}
-
-function showTooltip(text, card) {
-  const tooltip = createTooltip();
-  tooltip.innerHTML = `
-    <div class="nav-tooltip-arrow"></div>
-    <div class="nav-tooltip-content">${text.replace(/\n/g, '<br>')}</div>
-  `;
-  tooltip.style.display = 'block';
-
-  setTimeout(() => {
-    const cardRect = card.getBoundingClientRect();
-    const tooltipRect = tooltip.getBoundingClientRect();
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-    const scrollX = window.scrollX || document.documentElement.scrollLeft;
-    let top, left;
-    const spaceBelow = window.innerHeight - cardRect.bottom;
-    if (spaceBelow > tooltipRect.height + 18) {
-      top = cardRect.bottom + 8 + scrollY;
-      tooltip.classList.remove('nav-tooltip-up');
-      tooltip.classList.add('nav-tooltip-down');
-    } else {
-      top = cardRect.top - tooltipRect.height - 8 + scrollY;
-      tooltip.classList.remove('nav-tooltip-down');
-      tooltip.classList.add('nav-tooltip-up');
-    }
-    left = cardRect.left + cardRect.width / 2 - tooltipRect.width / 2 + scrollX;
-    left = Math.max(10, Math.min(left, window.innerWidth - tooltipRect.width - 10));
-    tooltip.style.top = `${top}px`;
-    tooltip.style.left = `${left}px`;
-  }, 0);
-}
-
-function hideTooltip() {
-  const tooltip = document.getElementById('nav-tooltip');
-  if (tooltip) tooltip.style.display = 'none';
-}
-
-function renderTags() {
-  const tagsBar = document.getElementById('tags');
-  tagsBar.innerHTML = '';
-  allCategories.forEach(cate => {
-    const tagBtn = document.createElement('button');
-    tagBtn.className = 'tag-btn' + (currentTag === cate ? ' active' : '');
-    tagBtn.textContent = cate;
-    tagBtn.onclick = () => {
-      currentTag = cate;
+// 左侧分类栏渲染
+function renderCategories() {
+  const catBox = document.getElementById('category-list');
+  catBox.innerHTML = '';
+  allCategories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'category-item' + (currentCategory === cat ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => {
+      currentCategory = cat;
       currentSearch = '';
       document.getElementById('search').value = '';
-      loadAndRenderLinks();
+      renderCategories();
+      renderLinks(allLinks);
     };
-    tagsBar.appendChild(tagBtn);
+    catBox.appendChild(btn);
   });
-  if (currentTag) {
-    const clearBtn = document.createElement('button');
-    clearBtn.className = 'tag-btn clear';
-    clearBtn.textContent = '全部';
-    clearBtn.onclick = () => {
-      currentTag = '';
-      loadAndRenderLinks();
+  // “全部”按钮
+  if (currentCategory) {
+    const allBtn = document.createElement('button');
+    allBtn.className = 'category-item';
+    allBtn.textContent = '全部';
+    allBtn.onclick = () => {
+      currentCategory = '';
+      renderCategories();
+      renderLinks(allLinks);
     };
-    tagsBar.insertBefore(clearBtn, tagsBar.firstChild);
+    catBox.insertBefore(allBtn, catBox.firstChild);
   }
 }
 
 function renderLinks(links) {
   const main = document.getElementById('main');
   main.innerHTML = '';
+  let showLinks = links;
+  if (currentSearch) {
+    showLinks = links.filter(l =>
+      (l.title && l.title.includes(currentSearch)) ||
+      (l.description && l.description.includes(currentSearch)) ||
+      (l.url && l.url.includes(currentSearch))
+    );
+  } else if (currentCategory) {
+    showLinks = links.filter(l => l.category === currentCategory);
+  }
+  // 按分类分组
   const groups = {};
-  links.forEach(link => {
+  showLinks.forEach(link => {
     const cat = link.category || '未分组';
     if (!groups[cat]) groups[cat] = [];
     groups[cat].push(link);
   });
-
   Object.entries(groups).forEach(([cat, items]) => {
     const section = document.createElement('section');
     section.className = 'group-section';
@@ -125,43 +86,31 @@ function renderLinks(links) {
           </div>
         </a>
       `;
-      card.onmouseenter = function() {
-        if (link.description) {
-          clearTimeout(tooltipTimer);
-          showTooltip(link.description, card);
-        }
-      };
-      card.onmouseleave = function() {
-        tooltipTimer = setTimeout(hideTooltip, 50);
-      };
       navList.appendChild(card);
     });
     main.appendChild(section);
   });
 }
 
+// 分类、数据初始化
 async function loadAllLinks() {
-  let url = '/api/nav-links';
-  if (currentSearch) {
-    url += '?search=' + encodeURIComponent(currentSearch);
-  } else if (currentTag) {
-    url += '?tag=' + encodeURIComponent(currentTag);
-  }
-  const resp = await fetch(url);
+  // 你自己的接口，这里用静态json演示
+  const resp = await fetch('/api/nav-links');
   allLinks = await resp.json();
   allCategories = Array.from(new Set(allLinks.map(l => l.category).filter(Boolean)));
 }
 
 async function loadAndRenderLinks() {
   await loadAllLinks();
-  renderTags();
+  renderCategories();
   renderLinks(allLinks);
 }
 
 document.getElementById('search').oninput = e => {
   currentSearch = e.target.value.trim();
-  currentTag = '';
-  loadAndRenderLinks();
+  currentCategory = '';
+  renderCategories();
+  renderLinks(allLinks);
 };
 
 loadAndRenderLinks();
