@@ -1,4 +1,4 @@
-import { hashPassword } from '../utils/password'
+import { verifyAdmin } from '../utils/auth'
 
 export async function onRequest(context: any) {
   const { request, env } = context;
