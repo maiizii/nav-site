@@ -1,4 +1,4 @@
-import { verifyAdmin, getAdminIdFromRequest } from '../../utils/auth';
+import { verifyAdmin, getAdminIdFromRequest } from '../utils/auth';
 
 export async function onRequest(context: any) {
   const { request, env } = context;
