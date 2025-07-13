@@ -10,9 +10,17 @@ const CAT_SAVE_API = "/api/nav-categories/update";
 const CAT_DEL_API = "/api/nav-categories/delete";
 const CAT_SORT_API = "/api/nav-categories/sort";
 
+let allCategories = [];
+
+async function fetchCategories() {
+  const res = await fetch(CAT_API);
+  const cats = (await res.json()).data || [];
+  allCategories = cats;
+}
+
 // tab切换
 document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn => {
-  btn.onclick = function () {
+  btn.onclick = async function () {
     document.querySelectorAll('.admin-menu-link').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
@@ -20,7 +28,10 @@ document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn =
     document.querySelector('.admin-menu-link[data-tab="' + tab + '"]').classList.add('active');
     document.querySelector('.admin-sidebar-item[data-tab="' + tab + '"]').classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active');
-    if (tab === 'nav') loadNavLinks();
+    if (tab === 'nav') {
+      await fetchCategories();
+      loadNavLinks();
+    }
     if (tab === 'cat') loadCategories();
   };
 });
@@ -53,7 +64,11 @@ function renderNavTable(list) {
           <td></td>
           <td><input type="text" id="add-title" placeholder="网站名称" required /></td>
           <td><input type="url" id="add-url" placeholder="链接" required /></td>
-          <td><input type="text" id="add-category" placeholder="分类" required /></td>
+          <td>
+            <select id="add-category">
+              ${allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+            </select>
+          </td>
           <td><input type="text" id="add-description" placeholder="描述" /></td>
           <td><input type="text" id="add-icon" placeholder="图标链接" /></td>
           <td>
@@ -66,7 +81,7 @@ function renderNavTable(list) {
   const tbody = document.getElementById('nav-tbody');
   list.forEach(nav => {
     const tr = document.createElement('tr');
-    tr.setAttribute('data-id', nav.id); // 用于排序
+    tr.setAttribute('data-id', nav.id);
     tr.innerHTML = `
       <td>
         <span class="drag-handle" style="cursor:grab;">&#9776;</span>
@@ -74,7 +89,11 @@ function renderNavTable(list) {
       </td>
       <td><input type="text" value="${nav.title}" id="title-${nav.id}" /></td>
       <td><input type="url" value="${nav.url}" id="url-${nav.id}" /></td>
-      <td><input type="text" value="${nav.category || ''}" id="category-${nav.id}" /></td>
+      <td>
+        <select id="category-${nav.id}">
+          ${allCategories.map(c => `<option value="${c.name}"${nav.category === c.name ? " selected" : ""}>${c.name}</option>`).join('')}
+        </select>
+      </td>
       <td><input type="text" value="${nav.description || ''}" id="desc-${nav.id}" /></td>
       <td><input type="text" value="${nav.icon || ''}" id="icon-${nav.id}" /></td>
       <td>
@@ -156,7 +175,7 @@ function renderNavTable(list) {
     });
     document.getElementById('add-title').value = '';
     document.getElementById('add-url').value = '';
-    document.getElementById('add-category').value = '';
+    document.getElementById('add-category').value = allCategories.length ? allCategories[0].name : '';
     document.getElementById('add-description').value = '';
     document.getElementById('add-icon').value = '';
     loadNavLinks();
@@ -196,7 +215,7 @@ function renderCategoryTable(list) {
   const tbody = document.getElementById('cat-tbody');
   list.forEach(cat => {
     const tr = document.createElement('tr');
-    tr.setAttribute('data-id', cat.id); // 用于排序
+    tr.setAttribute('data-id', cat.id);
     tr.innerHTML = `
       <td>
         <span class="drag-handle" style="cursor:grab;">&#9776;</span>
@@ -276,5 +295,8 @@ function renderCategoryTable(list) {
   };
 }
 
-// 默认加载导航管理
-document.addEventListener('DOMContentLoaded', loadNavLinks);
+// 默认加载
+document.addEventListener('DOMContentLoaded', async () => {
+  await fetchCategories();
+  loadNavLinks();
+});
