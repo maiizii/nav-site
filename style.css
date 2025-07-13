@@ -164,7 +164,8 @@ body {
   gap: 0;
   box-sizing: border-box;
   justify-content: flex-start;
-  position: relative;
+  position: sticky;
+  top: 70px;
   /* 高度自适应 */
 }
 
@@ -365,7 +366,7 @@ body {
   width: 100%;
 }
 
-/* 浮动注释卡片，浅底深色文字 */
+/* 浮动注释卡片，深色底、浅色字和箭头 */
 .nav-tooltip {
   position: absolute;
   z-index: 9999;
@@ -373,26 +374,26 @@ body {
   max-width: 340px;
   max-height: 320px;
   overflow: visible;
-  background: #fff;
-  color: #88af8e;
+  background: #232b27;
+  color: #f5faf8;
   border: none;
   border-radius: 13px;
   padding: 0;
   font-size: 1em;
-  box-shadow: 0 4px 16px 0 rgba(60,62,68,0.12), 0 1.5px 8px rgba(60,62,68,0.07);
+  box-shadow: 0 4px 18px 0 rgba(60,62,68,0.18), 0 1.5px 10px rgba(60,62,68,0.12);
   pointer-events: none;
   display: none;
   word-break: break-all;
   line-height: 1.6;
   transition: opacity 0.13s;
-  backdrop-filter: blur(12px) saturate(1.07);
-  -webkit-backdrop-filter: blur(12px) saturate(1.07);
+  backdrop-filter: blur(10px) saturate(1.07);
+  -webkit-backdrop-filter: blur(10px) saturate(1.07);
 }
 .nav-tooltip-content {
   padding: 13px 13px;
   text-align: center;
   font-size: 1.01em;
-  color: #88af8e;
+  color: #e6f9f0;
   font-weight: bold;
   word-break: break-all;
   display: flex;
@@ -413,13 +414,13 @@ body {
   top: -12px;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-bottom: 12px solid #fff;
+  border-bottom: 12px solid #232b27;
 }
 .nav-tooltip-up .nav-tooltip-arrow {
   bottom: -12px;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 12px solid #fff;
+  border-top: 12px solid #232b27;
 }
 
 footer {
@@ -459,6 +460,7 @@ footer {
     overflow-x: auto;
     padding: 14px 0;
     gap: 6px;
+    top: 70px;
   }
   .sidebar-categories-label {
     writing-mode: vertical-lr;
@@ -525,6 +527,7 @@ footer {
   .sidebar {
     padding: 8px 0;
     gap: 4px;
+    top: 60px;
   }
   .main-content {
     padding: 12px 2px;
