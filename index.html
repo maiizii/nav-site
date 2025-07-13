@@ -4,24 +4,33 @@
   <meta charset="UTF-8" />
   <title>TKCall风格导航站</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="仿TKCall亮色主题的网址导航。">
   <link rel="stylesheet" href="./style.css" />
-  <link rel="icon" href="./logo.svg" />
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="./logo.svg" alt="logo" class="logo-img">
-      <span class="site-title">TKCall导航站</span>
+  <!-- 页头 -->
+  <header class="tk-header">
+    <div class="tk-header-inner">
+      <div class="tk-logo">
+        <img src="./logo.svg" alt="logo" class="logo-img">
+        <span class="site-title">TKCall导航站</span>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search" placeholder="搜索导航、描述或网址..." autocomplete="off">
+      </div>
+      <div class="header-actions">
+        <!-- 可添加右侧操作按钮/头像等 -->
+      </div>
     </div>
-    <div class="search-bar">
-      <input type="text" id="search" placeholder="搜索导航、描述或网址..." autocomplete="off">
-    </div>
-    <div id="tags" class="tags-bar"></div>
   </header>
-  <main id="main"></main>
+  <!-- 主体区域：左侧分类，右侧内容 -->
+  <div class="container">
+    <aside class="sidebar">
+      <nav id="category-list" class="category-list"></nav>
+    </aside>
+    <main id="main" class="main-content"></main>
+  </div>
   <footer>
-    <p>© 2025 TKCall导航站 | 亮色极简风格</p>
+    <p>© 2025 TKCall导航站</p>
   </footer>
   <script src="./main.js"></script>
 </body>
