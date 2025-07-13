@@ -89,7 +89,7 @@ body {
   align-items: flex-start;
 }
 .admin-sidebar {
-  width: 100px;
+  width: 120px;
   flex: none;
   border-radius: 13px;
   background: #fff;
@@ -115,7 +115,7 @@ body {
   border-radius: 8px;
   border: none;
   font-size: 1.07em;
-  width: 70px;
+  width: 90px;
   height: 32px;
   outline: none;
   cursor: pointer;
