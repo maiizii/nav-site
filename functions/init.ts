@@ -1,9 +1,16 @@
-export async function onRequest(context) {
-  // 创建表
-  await context.env.DB.prepare('CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name TEXT)').run();
-  // 插入一行
-  await context.env.DB.prepare('INSERT INTO test (name) VALUES (?)').bind('hello').run();
-  // 查询
-  const row = await context.env.DB.prepare('SELECT * FROM test ORDER BY id DESC LIMIT 1').first();
-  return new Response(JSON.stringify(row));
+import { hashPassword } from './utils/password';
+
+export async function onRequest(context: any) {
+  const { env } = context;
+  const exist = await env.DB.prepare('SELECT id FROM admin WHERE username = ?').bind('admin').first();
+  if (exist) {
+    return new Response(JSON.stringify({ success: false, message: '管理员已存在' }), { status: 400 });
+  }
+
+  const passwordHash = await hashPassword('admin123');
+  await env.DB.prepare(
+    'INSERT INTO admin (username, password_hash) VALUES (?, ?)'
+  ).bind('admin', passwordHash).run();
+
+  return new Response(JSON.stringify({ success: true, message: '初始化成功，默认账号：admin/admin123' }));
 }
