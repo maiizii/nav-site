@@ -4,6 +4,8 @@ let currentCategory = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
+const ICON_URL = 'https://cdn.tkcall.com/original/1X/e71ad477c92f1bb9b32ce24bdc8d57ad0dd4fa97.png';
+
 const colorPalette = [
   "#88af8e", "#41e254", "#f8745c", "#fa6c8d", "#d4efd8", "#edf3ee"
 ];
@@ -13,7 +15,7 @@ function getColorByTitle(title) {
   return colorPalette[code % colorPalette.length];
 }
 
-// 分类栏渲染（无需补空格，始终居中）
+// 分类栏渲染
 function renderCategories() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
@@ -120,11 +122,7 @@ function renderLinks(links) {
       card.className = 'nav-card';
       card.innerHTML = `
         <a href="${link.url}" target="_blank" rel="noopener">
-          ${
-            link.icon
-              ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none';">`
-              : `<span class="nav-icon-default" style="background:${getColorByTitle(link.title)};">${(link.title || '').charAt(0).toUpperCase()}</span>`
-          }
+          <img src="${ICON_URL}" alt="icon" class="nav-icon" onerror="this.style.display='none';">
           <div class="nav-card-content">
             <div class="nav-title">${link.title}</div>
             <div class="nav-desc">${link.description || ''}</div>
