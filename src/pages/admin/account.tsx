@@ -6,7 +6,7 @@ export default function AccountPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch('/api/admin/account', { credentials: 'include' })
+    fetch('/admin/account', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.success) setAdmin(data.data);
@@ -20,7 +20,7 @@ export default function AccountPage() {
       setMessage('两次输入的新密码不一致');
       return;
     }
-    const res = await fetch('/api/admin/account/password', {
+    const res = await fetch('/admin/account/password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ oldPassword: form.oldPassword, newPassword: form.newPassword }),
