@@ -4,7 +4,7 @@ export default function AdminPage() {
   const [admin, setAdmin] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/api/admin/account', { credentials: 'include' })
+    fetch('/admin/account', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.success) setAdmin(data.data);
