@@ -1,25 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>管理后台</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>TKCall导航后台管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="https://cdn.tkcall.com/original/1X/e71ad477c92f1bb9b32ce24bdc8d57ad0dd4fa97.png" type="image/png">
+  <link rel="stylesheet" href="./admin.css" />
 </head>
 <body>
-  <h1>管理后台</h1>
-  <div id="adminContent"></div>
-  <script>
-    async function checkLogin() {
-      const res = await fetch('/auth/check', { credentials: 'include' });
-      const data = await res.json();
-      if (!data.success) {
-        location.href = 'login.html';
-      } else {
-        document.getElementById('adminContent').innerText = '欢迎，管理员！';
-        // 这里可以进一步加载数据库内容/导航项等
-      }
-    }
-    checkLogin();
-  </script>
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <div class="admin-logo">
+        <img src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" class="logo-img">
+        <span class="admin-title">TKCall导航后台管理</span>
+      </div>
+      <nav class="admin-menu">
+        <a class="admin-menu-link active" href="#" data-tab="categories">分类管理</a>
+        <a class="admin-menu-link" href="#" data-tab="websites">网址管理</a>
+        <!-- 可扩展更多菜单 -->
+      </nav>
+      <div class="admin-header-actions">
+        <button class="admin-logout-btn">退出</button>
+      </div>
+    </div>
+  </header>
+  <div class="admin-container">
+    <aside class="admin-sidebar">
+      <nav id="admin-sidebar-list" class="admin-sidebar-list">
+        <button class="admin-sidebar-item active" data-tab="categories">分类管理</button>
+        <button class="admin-sidebar-item" data-tab="websites">网址管理</button>
+      </nav>
+    </aside>
+    <main id="admin-main" class="admin-main-content">
+      <!-- 分类管理页 -->
+      <section id="tab-categories" class="admin-tab active">
+        <h2>分类管理</h2>
+        <form id="add-category-form" class="admin-form">
+          <input type="text" id="category-name" placeholder="新分类名称" required />
+          <button type="submit">添加分类</button>
+        </form>
+        <ul id="category-list" class="admin-list"></ul>
+      </section>
+      <!-- 网址管理页 -->
+      <section id="tab-websites" class="admin-tab">
+        <h2>网址管理</h2>
+        <form id="add-website-form" class="admin-form">
+          <input type="text" id="website-title" placeholder="网站名称" required />
+          <input type="url" id="website-url" placeholder="网站链接" required />
+          <select id="website-category">
+            <option value="">选择分类</option>
+          </select>
+          <button type="submit">添加网址</button>
+        </form>
+        <ul id="website-list" class="admin-list"></ul>
+      </section>
+    </main>
+  </div>
+  <footer>
+    <p>© 2025 TKCall后台管理</p>
+  </footer>
+  <script src="./admin.js"></script>
 </body>
 </html>
