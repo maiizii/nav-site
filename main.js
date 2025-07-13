@@ -4,6 +4,14 @@ let currentTag = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
+// 配色与TKCall主题9一致的首字母色块
+const colors = ["#3a6cf6", "#ff9800", "#4caf50", "#8f5ad5", "#ff5b5b", "#00bcd4"];
+function getColorByTitle(title) {
+  if (!title) return colors[0];
+  const code = title.charCodeAt(0);
+  return colors[code % colors.length];
+}
+
 function createTooltip() {
   let tooltip = document.getElementById('nav-tooltip');
   if (!tooltip) {
@@ -31,7 +39,7 @@ function showTooltip(text, card) {
     let top, left;
 
     const spaceBelow = window.innerHeight - cardRect.bottom;
-    const spaceAbove = cardRect.top;
+    // const spaceAbove = cardRect.top; // 没有用到，可删
 
     if (spaceBelow > tooltipRect.height + 18) {
       top = cardRect.bottom + 10 + scrollY;
@@ -99,13 +107,12 @@ function renderLinks(links) {
     items.forEach(link => {
       const card = document.createElement('div');
       card.className = 'nav-card';
-      // 图标优先显示图片，否则显示首字母色块
       card.innerHTML = `
         <a href="${link.url}" target="_blank" rel="noopener">
           ${
             link.icon
               ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none';">`
-              : `<span class="nav-icon-default">${(link.title || '').charAt(0).toUpperCase()}</span>`
+              : `<span class="nav-icon-default" style="background:${getColorByTitle(link.title)};">${(link.title || '').charAt(0).toUpperCase()}</span>`
           }
           <div class="nav-card-content">
             <div class="nav-title">${link.title}</div>
