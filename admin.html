@@ -16,7 +16,6 @@
       </div>
       <nav class="admin-menu">
         <a class="admin-menu-link active" href="#" data-tab="nav">导航管理</a>
-        <a class="admin-menu-link" href="#" data-tab="account">账号管理</a>
       </nav>
     </div>
   </header>
@@ -24,32 +23,12 @@
     <aside class="admin-sidebar">
       <nav class="admin-sidebar-list">
         <button class="admin-sidebar-item active" data-tab="nav">导航管理</button>
-        <button class="admin-sidebar-item" data-tab="account">账号管理</button>
       </nav>
     </aside>
     <main class="admin-main-content">
-      <!-- 导航管理页 -->
       <section id="tab-nav" class="admin-tab active">
         <h2>导航管理</h2>
-        <form id="add-nav-form" class="admin-form">
-          <input type="text" id="nav-title" placeholder="网站名称" required />
-          <input type="url" id="nav-url" placeholder="网站链接" required />
-          <input type="text" id="nav-category" placeholder="分类" required />
-          <input type="text" id="nav-description" placeholder="描述" />
-          <input type="text" id="nav-icon" placeholder="图标链接" />
-          <button type="submit">添加</button>
-        </form>
-        <ul id="nav-list" class="admin-list"></ul>
-      </section>
-      <!-- 账号管理页 -->
-      <section id="tab-account" class="admin-tab">
-        <h2>账号管理</h2>
-        <div id="admin-account-info"></div>
-        <form id="change-password-form" class="admin-form">
-          <input type="password" id="old-password" placeholder="旧密码" required />
-          <input type="password" id="new-password" placeholder="新密码" required />
-          <button type="submit">修改密码</button>
-        </form>
+        <div id="nav-list"></div>
       </section>
     </main>
   </div>
