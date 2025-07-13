@@ -179,24 +179,28 @@ main {
   color: #443;
 }
 .nav-tooltip-arrow {
-  width: 0; height: 0;
+  width: 0;
+  height: 0;
   margin: 0 auto;
+  display: block;
+  position: relative;
+  z-index: 1;
 }
 .nav-tooltip-down .nav-tooltip-arrow {
-  border-left: 11px solid transparent;
-  border-right: 11px solid transparent;
-  border-top: 13px solid #fff;
-  margin-top: -13px;
-  margin-bottom: 0;
-  filter: drop-shadow(0 2px 6px rgba(240,133,100,0.13));
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 14px solid #fff;
+  margin-top: -7px;
+  box-shadow: 0 6px 12px 0 rgba(240,133,100,0.15);
+  filter: drop-shadow(0 3px 8px rgba(240,133,100,0.12));
 }
 .nav-tooltip-up .nav-tooltip-arrow {
-  border-left: 11px solid transparent;
-  border-right: 11px solid transparent;
-  border-bottom: 13px solid #fff;
-  margin-bottom: -13px;
-  margin-top: 0;
-  filter: drop-shadow(0 -2px 6px rgba(240,133,100,0.13));
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 14px solid #fff;
+  margin-bottom: -7px;
+  box-shadow: 0 -6px 12px 0 rgba(240,133,100,0.13);
+  filter: drop-shadow(0 -3px 8px rgba(240,133,100,0.12));
 }
 footer {
   text-align: center;
