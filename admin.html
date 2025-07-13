@@ -15,6 +15,7 @@
       </div>
       <nav class="admin-menu">
         <a class="admin-menu-link active" href="#" data-tab="nav">导航管理</a>
+        <a class="admin-menu-link" href="#" data-tab="cat">分类管理</a>
       </nav>
     </div>
   </header>
@@ -22,12 +23,17 @@
     <aside class="admin-sidebar">
       <nav class="admin-sidebar-list">
         <button class="admin-sidebar-item active" data-tab="nav">导航管理</button>
+        <button class="admin-sidebar-item" data-tab="cat">分类管理</button>
       </nav>
     </aside>
     <main class="admin-main-content">
       <section id="tab-nav" class="admin-tab active">
         <h2>导航管理</h2>
         <div id="nav-list"></div>
+      </section>
+      <section id="tab-cat" class="admin-tab">
+        <h2>分类管理</h2>
+        <div id="cat-list"></div>
       </section>
     </main>
   </div>
