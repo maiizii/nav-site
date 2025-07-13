@@ -1,48 +1,145 @@
+// ==========================
+// TKCall导航页 main.js 最新版
+// 页头菜单静态，侧栏分类和内容区动态
+// ==========================
 let allLinks = [];
 let allCategories = [];
 let currentCategory = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-const colorPalette = [
-  "#88af8e", "#41e254", "#f8745c", "#fa6c8d", "#d4efd8", "#edf3ee"
-];
-function getColorByTitle(title) {
-  if (!title) return colorPalette[0];
-  const code = title.charCodeAt(0);
-  return colorPalette[code % colorPalette.length];
+// 侧栏分类菜单：从接口读取
+async function loadCategories() {
+  const resp = await fetch('/api/nav-categories/list');
+  const json = await resp.json();
+  allCategories = json.data || [];
+  renderCategoryList();
 }
 
-// 分类栏渲染
-function renderCategories() {
+// 侧栏分类渲染（纵向菜单，和页头无关）
+function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
+  // “全部”按钮
+  const allBtn = document.createElement('button');
+  allBtn.className = 'category-item' + (currentCategory === '' ? ' active' : '');
+  allBtn.textContent = '全部';
+  allBtn.onclick = function() {
+    currentCategory = '';
+    renderCategoryList();
+    renderLinks(allLinks);
+  };
+  catBox.appendChild(allBtn);
+
   allCategories.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'category-item' + (currentCategory === cat ? ' active' : '');
-    btn.textContent = cat;
-    btn.onclick = () => {
-      currentCategory = cat;
-      currentSearch = '';
-      document.getElementById('search').value = '';
-      renderCategories();
+    btn.className = 'category-item' + (currentCategory === cat.name ? ' active' : '');
+    btn.textContent = cat.name;
+    btn.onclick = function() {
+      currentCategory = cat.name;
+      renderCategoryList();
       renderLinks(allLinks);
     };
     catBox.appendChild(btn);
   });
-  // “全部”按钮
-  if (currentCategory) {
-    const allBtn = document.createElement('button');
-    allBtn.className = 'category-item';
-    allBtn.textContent = '全部';
-    allBtn.onclick = () => {
-      currentCategory = '';
-      renderCategories();
-      renderLinks(allLinks);
-    };
-    catBox.insertBefore(allBtn, catBox.firstChild);
+}
+
+// 导航项列表读取
+async function loadLinks() {
+  const resp = await fetch('/api/nav-links/list');
+  const json = await resp.json();
+  allLinks = json.data || [];
+  renderLinks(allLinks);
+}
+
+// 导航项渲染（分组显示/平铺显示）
+function renderLinks(links) {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  let showLinks = links;
+  // 搜索优先
+  if (currentSearch) {
+    showLinks = links.filter(l =>
+      (l.title && l.title.includes(currentSearch)) ||
+      (l.description && l.description.includes(currentSearch)) ||
+      (l.url && l.url.includes(currentSearch))
+    );
+  } else if (currentCategory) {
+    showLinks = links.filter(l => l.category === currentCategory);
+  }
+  // 按分类分组（只在“全部”时分组）
+  if (!currentSearch && !currentCategory) {
+    const groups = {};
+    showLinks.forEach(link => {
+      const cat = link.category || '未分组';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(link);
+    });
+    Object.entries(groups).forEach(([cat, items]) => {
+      const section = document.createElement('section');
+      section.className = 'group-section';
+      section.innerHTML = `<h2 class="group-title">${cat}</h2><div class="nav-list"></div>`;
+      const navList = section.querySelector('.nav-list');
+      items.forEach(link => {
+        navList.appendChild(createNavCard(link));
+      });
+      main.appendChild(section);
+    });
+  } else {
+    // 当前分类或搜索，直接平铺
+    const navList = document.createElement('div');
+    navList.className = 'nav-list';
+    showLinks.forEach(link => {
+      navList.appendChild(createNavCard(link));
+    });
+    main.appendChild(navList);
   }
 }
+
+// 导航项卡片
+function createNavCard(link) {
+  const card = document.createElement('div');
+  card.className = 'nav-card';
+  card.innerHTML = `
+    <a href="${link.url}" target="_blank" rel="noopener">
+      ${
+        link.icon
+          ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none';">`
+          : `<span class="nav-icon-default">${(link.title || '').charAt(0).toUpperCase()}</span>`
+      }
+      <div class="nav-card-content">
+        <div class="nav-title">${link.title}</div>
+        <div class="nav-desc">${link.description || ''}</div>
+      </div>
+    </a>
+  `;
+  card.onmouseenter = function() {
+    if (link.description) {
+      clearTimeout(tooltipTimer);
+      showTooltip(link.description, card);
+    }
+  };
+  card.onmouseleave = function() {
+    tooltipTimer = setTimeout(hideTooltip, 80);
+  };
+  return card;
+}
+
+// 搜索框监听
+document.getElementById('search').oninput = e => {
+  currentSearch = e.target.value.trim();
+  // 搜索时取消分类高亮
+  if (currentSearch) currentCategory = '';
+  renderCategoryList();
+  renderLinks(allLinks);
+};
+
+// 初始化：先读取分类后读取导航项
+async function initPage() {
+  await loadCategories();
+  await loadLinks();
+}
+document.addEventListener('DOMContentLoaded', initPage);
 
 // 浮动注释卡片
 function createTooltip() {
@@ -89,83 +186,3 @@ function hideTooltip() {
   const tooltip = document.getElementById('nav-tooltip');
   if (tooltip) tooltip.style.display = 'none';
 }
-
-function renderLinks(links) {
-  const main = document.getElementById('main');
-  main.innerHTML = '';
-  let showLinks = links;
-  if (currentSearch) {
-    showLinks = links.filter(l =>
-      (l.title && l.title.includes(currentSearch)) ||
-      (l.description && l.description.includes(currentSearch)) ||
-      (l.url && l.url.includes(currentSearch))
-    );
-  } else if (currentCategory) {
-    showLinks = links.filter(l => l.category === currentCategory);
-  }
-  // 按分类分组
-  const groups = {};
-  showLinks.forEach(link => {
-    const cat = link.category || '未分组';
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push(link);
-  });
-  Object.entries(groups).forEach(([cat, items]) => {
-    const section = document.createElement('section');
-    section.className = 'group-section';
-    section.innerHTML = `<h2 class="group-title">${cat}</h2><div class="nav-list"></div>`;
-    const navList = section.querySelector('.nav-list');
-    items.forEach(link => {
-      const card = document.createElement('div');
-      card.className = 'nav-card';
-      card.innerHTML = `
-        <a href="${link.url}" target="_blank" rel="noopener">
-          ${
-            link.icon
-              ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none';">`
-              : `<span class="nav-icon-default" style="background:${getColorByTitle(link.title)};">${(link.title || '').charAt(0).toUpperCase()}</span>`
-          }
-          <div class="nav-card-content">
-            <div class="nav-title">${link.title}</div>
-            <div class="nav-desc">${link.description || ''}</div>
-          </div>
-        </a>
-      `;
-      card.onmouseenter = function() {
-        if (link.description) {
-          clearTimeout(tooltipTimer);
-          showTooltip(link.description, card);
-        }
-      };
-      card.onmouseleave = function() {
-        tooltipTimer = setTimeout(hideTooltip, 80);
-      };
-      navList.appendChild(card);
-    });
-    main.appendChild(section);
-  });
-}
-
-// 分类、数据初始化
-async function loadAllLinks() {
-  // 改为请求排序正确的接口
-  const resp = await fetch('/api/nav-links/list');
-  const json = await resp.json();
-  allLinks = json.data || []; // 这里确保是数组
-  allCategories = Array.from(new Set(allLinks.map(l => l.category).filter(Boolean)));
-}
-
-async function loadAndRenderLinks() {
-  await loadAllLinks();
-  renderCategories();
-  renderLinks(allLinks);
-}
-
-document.getElementById('search').oninput = e => {
-  currentSearch = e.target.value.trim();
-  currentCategory = '';
-  renderCategories();
-  renderLinks(allLinks);
-};
-
-loadAndRenderLinks();
