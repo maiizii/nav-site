@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>管理员登录</title>
+</head>
+<body>
+  <h2>管理员登录</h2>
+  <form id="loginForm">
+    <input type="text" name="username" placeholder="用户名" /><br />
+    <input type="password" name="password" placeholder="密码" /><br />
+    <button type="submit">登录</button>
+  </form>
+  <div id="result"></div>
+  <script>
+    document.getElementById('loginForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: this.username.value,
+          password: this.password.value
+        })
+      });
+      const data = await res.json();
+      document.getElementById('result').innerText = data.message || (data.success ? '登录成功' : '登录失败');
+      if (data.success) setTimeout(() => location.href = 'admin.html', 1000);
+    }
+  </script>
+</body>
+</html>
