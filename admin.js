@@ -4,7 +4,28 @@ const DEL_API = "/api/nav-links/delete";
 const ADD_API = "/api/nav-links/add";
 const SORT_API = "/api/nav-links/sort";
 
-// 渲染导航列表为表格
+const CAT_API = "/api/nav-categories/list";
+const CAT_ADD_API = "/api/nav-categories/add";
+const CAT_SAVE_API = "/api/nav-categories/update";
+const CAT_DEL_API = "/api/nav-categories/delete";
+const CAT_SORT_API = "/api/nav-categories/sort";
+
+// tab切换
+document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn => {
+  btn.onclick = function () {
+    document.querySelectorAll('.admin-menu-link').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+    const tab = btn.getAttribute('data-tab');
+    document.querySelector('.admin-menu-link[data-tab="' + tab + '"]').classList.add('active');
+    document.querySelector('.admin-sidebar-item[data-tab="' + tab + '"]').classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (tab === 'nav') loadNavLinks();
+    if (tab === 'cat') loadCategories();
+  };
+});
+
+// 导航管理表格渲染
 async function loadNavLinks() {
   const res = await fetch(API);
   const links = (await res.json()).data || [];
@@ -79,7 +100,6 @@ function renderNavTable(list) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newOrder)
       }).then(res => res.json()).then(data => {
-        // 排序保存成功后刷新
         loadNavLinks();
       });
     }
@@ -96,7 +116,6 @@ function renderNavTable(list) {
         category: document.getElementById(`category-${id}`).value,
         description: document.getElementById(`desc-${id}`).value,
         icon: document.getElementById(`icon-${id}`).value
-        // sort 字段不在编辑时提交
       };
       await fetch(SAVE_API, {
         method: 'POST',
@@ -144,4 +163,118 @@ function renderNavTable(list) {
   };
 }
 
+// 分类管理表格渲染
+async function loadCategories() {
+  const res = await fetch(CAT_API);
+  const cats = (await res.json()).data || [];
+  renderCategoryTable(cats);
+}
+
+function renderCategoryTable(list) {
+  const catList = document.getElementById('cat-list');
+  catList.innerHTML = `
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:48px;">排序</th>
+          <th>分类名称</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="cat-tbody"></tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          <td><input type="text" id="add-cat-name" placeholder="分类名称" required /></td>
+          <td>
+            <button id="add-cat-btn">新增</button>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  `;
+  const tbody = document.getElementById('cat-tbody');
+  list.forEach(cat => {
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-id', cat.id); // 用于排序
+    tr.innerHTML = `
+      <td>
+        <span class="drag-handle" style="cursor:grab;">&#9776;</span>
+        ${cat.sort || ""}
+      </td>
+      <td><input type="text" value="${cat.name}" id="name-${cat.id}" /></td>
+      <td>
+        <button class="save-cat-btn" data-id="${cat.id}">保存</button>
+        <button class="del-cat-btn" data-id="${cat.id}">删除</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // 拖拽排序
+  Sortable.create(tbody, {
+    animation: 150,
+    handle: '.drag-handle',
+    onEnd: function () {
+      const newOrder = [];
+      tbody.querySelectorAll('tr').forEach((tr, idx) => {
+        const id = tr.getAttribute('data-id');
+        if (id) newOrder.push({ id: Number(id), sort: idx + 1 });
+      });
+      fetch(CAT_SORT_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      }).then(res => res.json()).then(data => {
+        loadCategories();
+      });
+    }
+  });
+
+  // 保存（编辑分类）
+  tbody.querySelectorAll('.save-cat-btn').forEach(btn => {
+    btn.onclick = async (e) => {
+      const id = btn.getAttribute('data-id');
+      const payload = {
+        id,
+        name: document.getElementById(`name-${id}`).value
+      };
+      await fetch(CAT_SAVE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      loadCategories();
+    };
+  });
+
+  // 删除
+  tbody.querySelectorAll('.del-cat-btn').forEach(btn => {
+    btn.onclick = async (e) => {
+      const id = btn.getAttribute('data-id');
+      if (!confirm('确定要删除该分类吗？')) return;
+      await fetch(CAT_DEL_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      loadCategories();
+    };
+  });
+
+  // 新增
+  document.getElementById('add-cat-btn').onclick = async () => {
+    const name = document.getElementById('add-cat-name').value;
+    if (!name.trim()) return;
+    await fetch(CAT_ADD_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    document.getElementById('add-cat-name').value = '';
+    loadCategories();
+  };
+}
+
+// 默认加载导航管理
 document.addEventListener('DOMContentLoaded', loadNavLinks);
