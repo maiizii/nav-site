@@ -3,8 +3,8 @@ compatibility_date = "2025-07-13"
 
 [env.production]
 d1_databases = [
-  { binding = "DB", database_name = "nav_site_db", database_id = "your-d1-id" }
+  { binding = "DB", database_name = "nav_site_db", database_id = "nav_site_db" }
 ]
 kv_namespaces = [
-  { binding = "KV", id = "your-kv-id" }
+  { binding = "KV", id = "NAV_KV" }
 ]
