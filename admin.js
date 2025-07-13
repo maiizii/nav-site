@@ -1,13 +1,12 @@
 const API = '/api/nav-links';
 
-// 渲染导航列表（表格+编辑）
+// 渲染导航列表为表格
 async function loadNavLinks() {
   const res = await fetch(API);
   const links = await res.json();
   renderNavTable(links);
 }
 
-// 渲染表格
 function renderNavTable(list) {
   const navList = document.getElementById('nav-list');
   navList.innerHTML = `
