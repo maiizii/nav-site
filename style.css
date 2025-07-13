@@ -148,7 +148,7 @@ body {
   padding: 0 32px;
   box-sizing: border-box;
   gap: 28px;
-  align-items: flex-start; /* 左右上对齐 */
+  align-items: flex-start;
 }
 
 .sidebar {
@@ -166,7 +166,6 @@ body {
   justify-content: flex-start;
   position: sticky;
   top: 70px;
-  /* 高度自适应 */
 }
 
 .sidebar-categories-label {
@@ -217,7 +216,7 @@ body {
   border-left: 4px solid #88af8e;
 }
 
-/* TOP按钮：扁平、圆角、绿色边框、hover绿色填充 */
+/* TOP按钮：扁平、圆角、#88af8e边框、hover填充 */
 .sidebar-top-btn {
   width: 64px;
   height: 32px;
@@ -227,10 +226,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #1ca57d;
+  border: 2px solid #88af8e;
   border-radius: 16px;
   background: #fff;
-  color: #1ca57d;
+  color: #88af8e;
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 1px;
@@ -239,7 +238,7 @@ body {
   box-shadow: none;
 }
 .sidebar-top-btn:hover {
-  background: #1ca57d;
+  background: #88af8e;
   color: #fff;
 }
 
@@ -313,7 +312,7 @@ body {
   border-radius: 7px;
   vertical-align: middle;
   margin-right: 12px;
-  background: #d4efd8;
+  background: #fff; /* 图标透明底色用白色 */
   object-fit: cover;
   flex-shrink: 0;
   border: 1px solid #edf3ee;
@@ -366,7 +365,7 @@ body {
   width: 100%;
 }
 
-/* 浮动注释卡片，深色底、浅色字和箭头 */
+/* 浮动注释卡片，#88af8e深色底、浅色字和箭头，文字不加粗 */
 .nav-tooltip {
   position: absolute;
   z-index: 9999;
@@ -374,13 +373,13 @@ body {
   max-width: 340px;
   max-height: 320px;
   overflow: visible;
-  background: #232b27;
+  background: #88af8e;
   color: #f5faf8;
   border: none;
   border-radius: 13px;
   padding: 0;
   font-size: 1em;
-  box-shadow: 0 4px 18px 0 rgba(60,62,68,0.18), 0 1.5px 10px rgba(60,62,68,0.12);
+  box-shadow: 0 4px 18px 0 rgba(136,175,142,0.18), 0 1.5px 10px rgba(136,175,142,0.12);
   pointer-events: none;
   display: none;
   word-break: break-all;
@@ -393,8 +392,8 @@ body {
   padding: 13px 13px;
   text-align: center;
   font-size: 1.01em;
-  color: #e6f9f0;
-  font-weight: bold;
+  color: #f5faf8;
+  font-weight: normal;
   word-break: break-all;
   display: flex;
   align-items: center;
@@ -414,13 +413,13 @@ body {
   top: -12px;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-bottom: 12px solid #232b27;
+  border-bottom: 12px solid #88af8e;
 }
 .nav-tooltip-up .nav-tooltip-arrow {
   bottom: -12px;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 12px solid #232b27;
+  border-top: 12px solid #88af8e;
 }
 
 footer {
