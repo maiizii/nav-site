@@ -106,8 +106,10 @@ function renderLinks(links) {
               ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none'">`
               : `<span class="nav-icon-default">${(link.title || '').charAt(0).toUpperCase()}</span>`
           }
-          <strong>${link.title}</strong>
-          <p class="nav-desc">${link.description || ''}</p>
+          <div class="nav-card-content">
+            <div class="nav-title">${link.title}</div>
+            <div class="nav-desc">${link.description || ''}</div>
+          </div>
         </a>
       `;
       card.onmouseenter = function() {
