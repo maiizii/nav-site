@@ -15,44 +15,41 @@
         <span class="admin-title">TKCall导航后台管理</span>
       </div>
       <nav class="admin-menu">
-        <a class="admin-menu-link active" href="#" data-tab="categories">分类管理</a>
-        <a class="admin-menu-link" href="#" data-tab="websites">网址管理</a>
-        <!-- 可扩展更多菜单 -->
+        <a class="admin-menu-link active" href="#" data-tab="nav">导航管理</a>
+        <a class="admin-menu-link" href="#" data-tab="account">账号管理</a>
       </nav>
-      <div class="admin-header-actions">
-        <button class="admin-logout-btn">退出</button>
-      </div>
     </div>
   </header>
   <div class="admin-container">
     <aside class="admin-sidebar">
-      <nav id="admin-sidebar-list" class="admin-sidebar-list">
-        <button class="admin-sidebar-item active" data-tab="categories">分类管理</button>
-        <button class="admin-sidebar-item" data-tab="websites">网址管理</button>
+      <nav class="admin-sidebar-list">
+        <button class="admin-sidebar-item active" data-tab="nav">导航管理</button>
+        <button class="admin-sidebar-item" data-tab="account">账号管理</button>
       </nav>
     </aside>
-    <main id="admin-main" class="admin-main-content">
-      <!-- 分类管理页 -->
-      <section id="tab-categories" class="admin-tab active">
-        <h2>分类管理</h2>
-        <form id="add-category-form" class="admin-form">
-          <input type="text" id="category-name" placeholder="新分类名称" required />
-          <button type="submit">添加分类</button>
+    <main class="admin-main-content">
+      <!-- 导航管理页 -->
+      <section id="tab-nav" class="admin-tab active">
+        <h2>导航管理</h2>
+        <form id="add-nav-form" class="admin-form">
+          <input type="text" id="nav-title" placeholder="网站名称" required />
+          <input type="url" id="nav-url" placeholder="网站链接" required />
+          <input type="text" id="nav-category" placeholder="分类" required />
+          <input type="text" id="nav-description" placeholder="描述" />
+          <input type="text" id="nav-icon" placeholder="图标链接" />
+          <button type="submit">添加</button>
         </form>
-        <ul id="category-list" class="admin-list"></ul>
+        <ul id="nav-list" class="admin-list"></ul>
       </section>
-      <!-- 网址管理页 -->
-      <section id="tab-websites" class="admin-tab">
-        <h2>网址管理</h2>
-        <form id="add-website-form" class="admin-form">
-          <input type="text" id="website-title" placeholder="网站名称" required />
-          <input type="url" id="website-url" placeholder="网站链接" required />
-          <select id="website-category">
-            <option value="">选择分类</option>
-          </select>
-          <button type="submit">添加网址</button>
+      <!-- 账号管理页 -->
+      <section id="tab-account" class="admin-tab">
+        <h2>账号管理</h2>
+        <div id="admin-account-info"></div>
+        <form id="change-password-form" class="admin-form">
+          <input type="password" id="old-password" placeholder="旧密码" required />
+          <input type="password" id="new-password" placeholder="新密码" required />
+          <button type="submit">修改密码</button>
         </form>
-        <ul id="website-list" class="admin-list"></ul>
       </section>
     </main>
   </div>
