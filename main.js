@@ -1,12 +1,10 @@
-// 适配 style.css 结构，分类侧栏按 sort 排序显示
-
 let allLinks = [];
 let allCategories = [];
 let currentCategory = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// 侧栏分类菜单：从接口读取
+// 读取分类
 async function loadCategories() {
   const resp = await fetch('/api/nav-categories/list');
   const json = await resp.json();
@@ -14,7 +12,7 @@ async function loadCategories() {
   renderCategoryList();
 }
 
-// 侧栏分类渲染，按 sort 字段升序排序
+// 侧栏分类渲染，按 sort 排序
 function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
@@ -29,7 +27,7 @@ function renderCategoryList() {
   };
   catBox.appendChild(allBtn);
 
-  // 按 sort 字段升序排序
+  // 分类排序
   const sortedCats = [...allCategories].sort((a, b) => {
     const sa = typeof a.sort === 'number' ? a.sort : 9999;
     const sb = typeof b.sort === 'number' ? b.sort : 9999;
@@ -49,7 +47,7 @@ function renderCategoryList() {
   });
 }
 
-// 导航项列表读取
+// 读取导航项
 async function loadLinks() {
   const resp = await fetch('/api/nav-links/list');
   const json = await resp.json();
@@ -57,7 +55,7 @@ async function loadLinks() {
   renderLinks(allLinks);
 }
 
-// 导航项渲染（分组显示/平铺显示）
+// 内容区渲染（分组且排序）
 function renderLinks(links) {
   const main = document.getElementById('main');
   main.innerHTML = '';
@@ -72,29 +70,71 @@ function renderLinks(links) {
   } else if (currentCategory) {
     showLinks = links.filter(l => l.category === currentCategory);
   }
-  // 按分类分组（只在“全部”时分组）
+
+  // 获取分类排序后的列表
+  const sortedCats = [...allCategories].sort((a, b) => {
+    const sa = typeof a.sort === 'number' ? a.sort : 9999;
+    const sb = typeof b.sort === 'number' ? b.sort : 9999;
+    return sa - sb;
+  });
+
+  // “全部”或搜索为空时，分组显示
   if (!currentSearch && !currentCategory) {
+    // 先分组：分类名->导航项[]
     const groups = {};
     showLinks.forEach(link => {
       const cat = link.category || '未分组';
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(link);
     });
-    Object.entries(groups).forEach(([cat, items]) => {
+
+    // 按分类排序分组显示
+    sortedCats.forEach(cat => {
+      const catName = cat.name;
+      const items = groups[catName];
+      if (!items || items.length === 0) return;
+      // 分类内导航项按 sort 排序
+      const sortedItems = [...items].sort((a, b) => {
+        const sa = typeof a.sort === 'number' ? a.sort : 9999;
+        const sb = typeof b.sort === 'number' ? b.sort : 9999;
+        return sa - sb;
+      });
       const section = document.createElement('section');
       section.className = 'group-section';
-      section.innerHTML = `<h2 class="group-title">${cat}</h2><div class="nav-list"></div>`;
+      section.innerHTML = `<h2 class="group-title">${catName}</h2><div class="nav-list"></div>`;
       const navList = section.querySelector('.nav-list');
-      items.forEach(link => {
+      sortedItems.forEach(link => {
         navList.appendChild(createNavCard(link));
       });
       main.appendChild(section);
     });
+
+    // 处理未分组
+    if (groups['未分组'] && groups['未分组'].length > 0) {
+      const sortedItems = [...groups['未分组']].sort((a, b) => {
+        const sa = typeof a.sort === 'number' ? a.sort : 9999;
+        const sb = typeof b.sort === 'number' ? b.sort : 9999;
+        return sa - sb;
+      });
+      const section = document.createElement('section');
+      section.className = 'group-section';
+      section.innerHTML = `<h2 class="group-title">未分组</h2><div class="nav-list"></div>`;
+      const navList = section.querySelector('.nav-list');
+      sortedItems.forEach(link => {
+        navList.appendChild(createNavCard(link));
+      });
+      main.appendChild(section);
+    }
   } else {
-    // 当前分类或搜索，直接平铺
+    // 当前分类或搜索，直接平铺（分类内也按导航项sort排序）
+    const sortedItems = [...showLinks].sort((a, b) => {
+      const sa = typeof a.sort === 'number' ? a.sort : 9999;
+      const sb = typeof b.sort === 'number' ? b.sort : 9999;
+      return sa - sb;
+    });
     const navList = document.createElement('div');
     navList.className = 'nav-list';
-    showLinks.forEach(link => {
+    sortedItems.forEach(link => {
       navList.appendChild(createNavCard(link));
     });
     main.appendChild(navList);
@@ -139,7 +179,7 @@ document.getElementById('search').oninput = e => {
   renderLinks(allLinks);
 };
 
-// 初始化：先读取分类后读取导航项
+// 初始化
 async function initPage() {
   await loadCategories();
   await loadLinks();
