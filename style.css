@@ -1,6 +1,6 @@
 body {
-  background: #f6f6f8 url('https://tkcall-upload-us.s3.dualstack.us-west-1.amazonaws.com/original/1X/bf14c792424aa926643bf39cc603e6d8128e62f9.png') repeat;
-  color: #222b45;
+  background: #f2f2f2 url('https://tkcall-upload-us.s3.dualstack.us-west-1.amazonaws.com/original/1X/bf14c792424aa926643bf39cc603e6d8128e62f9.png') repeat;
+  color: #222; /* 主色 */
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
   margin: 0;
 }
@@ -25,7 +25,7 @@ header {
   font-size: 1.7em;
   font-weight: bold;
   margin-left: 10px;
-  color: #222b45;
+  color: #222; /* 主色 */
   letter-spacing: 0.02em;
 }
 
@@ -38,15 +38,15 @@ header {
   font-size: 1em;
   padding: 10px 18px;
   border-radius: 12px;
-  border: 1px solid #e4e6ec;
-  background: #f8f9fb;
-  color: #222b45;
+  border: 1px solid #edf3ee; /* 选中/活跃选定色 */
+  background: #f5f5f5; /* 慢停/悬停焦点背景色 */
+  color: #222;
   outline: none;
   transition: background 0.2s, border 0.2s;
 }
 .search-bar input:focus {
   background: #fff;
-  border: 1.5px solid #3a6cf6;
+  border: 1.5px solid #88af8e; /* 第三/强调色 */
 }
 
 .tags-bar {
@@ -57,33 +57,34 @@ header {
   justify-content: center;
 }
 .tag-btn {
-  background: #f7f8fa;
-  color: #3a6cf6;
-  border: 1px solid #e3e6ec;
+  background: #f2f2f2; /* 慢停/悬停焦点背景色 */
+  color: #88af8e;      /* 第三/强调色 */
+  border: 1px solid #edf3ee; /* 选中/活跃选定色 */
   border-radius: 15px;
   padding: 6px 18px;
   font-size: 1em;
   cursor: pointer;
   transition: background 0.14s, color 0.14s, border 0.14s;
 }
-.tag-btn.active, .tag-btn:hover {
-  background: #e6edfb;
+.tag-btn.active,
+.tag-btn:hover {
+  background: #88af8e; /* 第三/强调色 */
   color: #fff;
-  border: 1px solid #3a6cf6;
+  border: 1px solid #88af8e;
 }
 .tag-btn.clear {
   background: #fff;
-  color: #3a6cf6;
-  border: 1px solid #e3e6ec;
+  color: #88af8e;
+  border: 1px solid #edf3ee;
 }
 
 main {
   max-width: 1080px;
   margin: 40px auto 0 auto;
-  background: #fff;
+  background: #fff; /* 页眉背景、主内容白色 */
   padding: 28px 18px;
   border-radius: 13px;
-  box-shadow: 0 1px 8px rgba(60,70,130,0.07);
+  box-shadow: 0 1px 8px rgba(136,175,142,0.07);
 }
 
 .group-section {
@@ -92,7 +93,7 @@ main {
 .group-title {
   font-size: 1.14em;
   font-weight: 700;
-  color: #3a6cf6;
+  color: #88af8e; /* 第三/强调色 */
   margin-bottom: 16px;
   margin-top: 0;
   letter-spacing: 1px;
@@ -109,17 +110,19 @@ main {
 .nav-card {
   background: #fff;
   border-radius: 11px;
-  box-shadow: 0 1px 6px rgba(60, 70, 130, 0.05);
+  box-shadow: 0 1px 6px #edf3ee;
   display: flex;
   align-items: center;
-  transition: box-shadow 0.13s, transform 0.13s;
+  transition: box-shadow 0.13s, transform 0.13s, background 0.13s;
   position: relative;
   padding: 12px 12px 12px 10px;
+  border: 1px solid #edf3ee;
 }
 .nav-card:hover {
-  box-shadow: 0 6px 20px rgba(60,70,130,0.13);
-  background: #f8faff;
+  box-shadow: 0 6px 20px #d4efd8;
+  background: #f5f5f5; /* 慢停 */
   transform: translateY(-1px) scale(1.01);
+  border: 1px solid #88af8e; /* 第三/强调色 */
 }
 
 .nav-icon {
@@ -128,16 +131,16 @@ main {
   border-radius: 7px;
   vertical-align: middle;
   margin-right: 13px;
-  background: #f3f6fb;
+  background: #d4efd8; /* 突出显示 */
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid #e3e6ec;
+  border: 1px solid #edf3ee;
   display: block;
 }
 .nav-icon-default {
   display: inline-block;
   width: 34px; height: 34px;
-  background: #3a6cf6;
+  background: #88af8e; /* 第三/强调色 */
   color: #fff;
   font-size: 1.08em;
   border-radius: 7px;
@@ -146,7 +149,7 @@ main {
   margin-right: 13px;
   font-weight: bold;
   flex-shrink: 0;
-  border: 1px solid #e3e6ec;
+  border: 1px solid #edf3ee;
   user-select: none;
 }
 .nav-card-content {
@@ -156,7 +159,7 @@ main {
 .nav-title {
   font-size: 1.03em;
   font-weight: 700;
-  color: #222b45;
+  color: #222;
   margin: 0;
   line-height: 1.32;
   white-space: nowrap;
@@ -165,7 +168,7 @@ main {
 }
 .nav-desc {
   font-size: 0.97em;
-  color: #8f5ad5;
+  color: #333; /* 页眉主要/次要色 */
   margin: 3px 0 0 0;
   line-height: 1.4;
   white-space: nowrap;
@@ -190,12 +193,12 @@ main {
   max-height: 320px;
   overflow: visible;
   background: #fff;
-  color: #3a6cf6;
+  color: #88af8e; /* 第三/强调色 */
   border: none;
   border-radius: 13px;
   padding: 0;
   font-size: 1em;
-  box-shadow: 0 6px 18px rgba(60,70,130,0.13);
+  box-shadow: 0 6px 18px #d4efd8;
   pointer-events: none;
   display: none;
   word-break: break-all;
@@ -206,7 +209,7 @@ main {
   padding: 13px 13px;
   text-align: center;
   font-size: 1.01em;
-  color: #8f5ad5;
+  color: #88af8e; /* 第三/强调色 */
   word-break: break-all;
   display: flex;
   align-items: center;
@@ -275,3 +278,9 @@ footer {
     font-size: 0.98em;
   }
 }
+
+/* 特殊色块（如危险、成功、爱）供标签/按钮使用，可按需加class */
+.btn-danger, .tag-danger { background: #f8745c !important; color: #fff !important;}
+.btn-success, .tag-success { background: #41e254 !important; color: #fff !important;}
+.btn-love, .tag-love { background: #fa6c8d !important; color: #fff !important;}
+.btn-choice, .tag-choice { background: #edf3ee !important; color: #333 !important;}
