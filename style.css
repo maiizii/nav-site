@@ -172,36 +172,48 @@ main {
   line-height: 1.6;
   transition: opacity 0.13s;
 }
+
 .nav-tooltip-content {
   padding: 20px 22px 16px 22px;
   text-align: left;
   font-size: 1.08em;
   color: #443;
 }
+
+/* 箭头绝对定位，底部/顶部与浮层边缘对齐 */
 .nav-tooltip-arrow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   width: 0;
   height: 0;
-  margin: 0 auto;
-  display: block;
-  position: relative;
-  z-index: 1;
+  z-index: 2;
+  /* 不要 margin 了，用 bottom/top 贴边 */
 }
+
+/* 浮层在下方，箭头在顶部，底部与卡片顶部对齐 */
 .nav-tooltip-down .nav-tooltip-arrow {
+  top: -14px; /* 箭头底部贴浮层顶部 */
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-bottom: 14px solid #fff; /* 朝上 */
-  margin-bottom: -7px;
+  border-bottom: 14px solid #fff;
   box-shadow: 0 6px 12px 0 rgba(240,133,100,0.15);
   filter: drop-shadow(0 3px 8px rgba(240,133,100,0.12));
 }
+
+/* 浮层在上方，箭头在底部，顶部与卡片底部对齐 */
 .nav-tooltip-up .nav-tooltip-arrow {
+  bottom: -14px; /* 箭头顶部贴浮层底部 */
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-top: 14px solid #fff; /* 朝下 */
-  margin-top: -7px;
+  border-top: 14px solid #fff;
   box-shadow: 0 -6px 12px 0 rgba(240,133,100,0.13);
   filter: drop-shadow(0 -3px 8px rgba(240,133,100,0.12));
 }
+
+.nav-tooltip-down { padding-top: 14px; }
+.nav-tooltip-up   { padding-bottom: 14px; }
+
 footer {
   text-align: center;
   font-size: 0.97em;
