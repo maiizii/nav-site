@@ -193,6 +193,14 @@ body {
 .admin-table button:hover {
   background: #08805b;
 }
+/* 拖拽排序手柄样式新增 */
+.drag-handle {
+  font-size: 18px;
+  color: #888;
+  margin-right: 4px;
+  cursor: grab;
+  vertical-align: middle;
+}
 footer {
   text-align: center;
   font-size: 0.97em;
