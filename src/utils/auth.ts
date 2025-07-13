@@ -1,6 +1,6 @@
 const AUTH_COOKIE_NAME = 'admin_token';
 
-export function getAdminIdFromRequest(request) {
+export function getAdminIdFromRequest(request: Request) {
   const cookie = request.headers.get('Cookie') || '';
   const match = cookie.match(new RegExp(`${AUTH_COOKIE_NAME}=([^;]+)`));
   if (!match) return null;
@@ -13,10 +13,9 @@ export function getAdminIdFromRequest(request) {
   }
 }
 
-export async function verifyAdmin(request, env) {
+export async function verifyAdmin(request: Request, env: any) {
   const adminId = getAdminIdFromRequest(request);
   if (!adminId) return false;
-  // 检查数据库是否有此 id
   const admin = await env.DB.prepare('SELECT id FROM admin WHERE id = ?').bind(adminId).first();
   return !!admin;
 }
