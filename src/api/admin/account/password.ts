@@ -1,7 +1,7 @@
 import { verifyAdmin, getAdminIdFromRequest } from '../../utils/auth';
 import { hash, compare } from 'bcryptjs';
 
-export async function onRequest(context) {
+export async function onRequest(context: any) {
   const { request, env } = context;
   if (!(await verifyAdmin(request, env))) {
     return new Response(JSON.stringify({ success: false, message: '未登录' }), { status: 401 });
@@ -10,7 +10,6 @@ export async function onRequest(context) {
   const body = await request.json();
   const { oldPassword, newPassword } = body;
 
-  // 查询旧密码
   const admin = await env.DB.prepare('SELECT password_hash FROM admin WHERE id = ?').bind(adminId).first();
   if (!admin) return new Response(JSON.stringify({ success: false, message: '管理员不存在' }), { status: 404 });
 
