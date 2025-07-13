@@ -158,9 +158,9 @@ main {
   justify-content: center; /* 水平居中 */
 }
 
-/* 浮动卡片及箭头修正 */
+/* 正确的浮层和箭头实现 */
 .nav-tooltip {
-  position: relative; /* 关键：为绝对定位箭头提供参考 */
+  position: absolute; /* 必须absolute，不要relative */
   z-index: 9999;
   min-width: 220px;
   max-width: 360px;
@@ -188,7 +188,7 @@ main {
   word-break: break-all;
 }
 
-/* 纯白三角箭头，无任何特效，绝对定位贴边 */
+/* 箭头父容器必须absolute，且浮层要有padding-top或padding-bottom留出箭头空间 */
 .nav-tooltip-arrow {
   position: absolute;
   left: 50%;
@@ -196,6 +196,7 @@ main {
   width: 0;
   height: 0;
   z-index: 2;
+  pointer-events: none;
 }
 
 /* 下方浮层，箭头底部贴浮层顶部 */
