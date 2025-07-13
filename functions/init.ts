@@ -1,4 +1,4 @@
-import { hash } from 'bcryptjs';
+import { hashPassword } from './utils/password';
 
 export async function onRequest(context: any) {
   const { env } = context;
@@ -7,7 +7,7 @@ export async function onRequest(context: any) {
     return new Response(JSON.stringify({ success: false, message: '管理员已存在' }), { status: 400 });
   }
 
-  const passwordHash = await hash('admin123', 10);
+  const passwordHash = await hashPassword('admin123');
   await env.DB.prepare(
     'INSERT INTO admin (username, password_hash) VALUES (?, ?)'
   ).bind('admin', passwordHash).run();
