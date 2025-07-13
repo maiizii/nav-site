@@ -101,11 +101,10 @@ function renderLinks(links) {
       card.className = 'nav-card';
       card.innerHTML = `
         <a href="${link.url}" target="_blank" rel="noopener">
-          ${
-            link.icon
-              ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none'">`
-              : `<span class="nav-icon-default">${(link.title || '').charAt(0).toUpperCase()}</span>`
-          }
+          <img src="${link.icon ? link.icon : 'https://tkcall.com/favicon.ico'}"
+               alt="icon"
+               class="nav-icon"
+               onerror="this.src='https://tkcall.com/favicon.ico';">
           <div class="nav-card-content">
             <div class="nav-title">${link.title}</div>
             <div class="nav-desc">${link.description || ''}</div>
