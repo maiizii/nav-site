@@ -1,22 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-cn">
 <head>
   <meta charset="UTF-8" />
-  <title>TKCall风格导航站</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- 网站 favicon -->
-  <link rel="icon" href="https://cdn.tkcall.com/original/1X/e71ad477c92f1bb9b32ce24bdc8d57ad0dd4fa97.png" type="image/png">
-  <link rel="stylesheet" href="./style.css" />
+  <title>TKCall导航</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="./main.css" />
 </head>
 <body>
-  <header class="tk-header">
-    <div class="tk-header-inner">
-      <div class="tk-logo">
-        <!-- 页头 logo 图片 -->
-        <img src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" class="logo-img">
-        <span class="site-nav-title">网站导航</span>
-      </div>
-      <nav class="tk-menu">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <img class="logo-img" src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" />
+      <span class="logo-title">TKCall导航</span>
+      <nav id="category-nav" class="category-nav">
         <a class="tk-menu-link" href="#">日常</a>
         <a class="tk-menu-link" href="#">运营</a>
         <a class="tk-menu-link" href="#">技术</a>
@@ -24,24 +19,19 @@
         <a class="tk-menu-link" href="#">推广</a>
         <a class="tk-menu-link" href="#">交易</a>
       </nav>
-      <div class="header-actions">
-        <button class="header-btn">设置</button>
-      </div>
-      <div class="search-bar">
-        <input type="text" id="search" placeholder="搜索导航、描述或网址..." autocomplete="off">
-      </div>
+      <input id="search" type="text" class="search-input" placeholder="搜索..." />
     </div>
   </header>
-  <div class="container">
-    <aside class="sidebar">
-      <div class="sidebar-categories-label">分类</div>
-      <nav id="category-list" class="category-list"></nav>
-      <button class="sidebar-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">TOP</button>
+  <div class="page-main">
+    <aside id="category-list" class="category-list">
+      <!-- 分类侧栏由 main.js 动态插入 -->
     </aside>
-    <main id="main" class="main-content"></main>
+    <section id="main" class="main-content">
+      <!-- 导航项列表由 main.js 动态插入 -->
+    </section>
   </div>
   <footer>
-    <p>© 2025 TKCall导航站</p>
+    <p>© 2025 TKCall导航</p>
   </footer>
   <script src="./main.js"></script>
 </body>
