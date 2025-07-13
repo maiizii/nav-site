@@ -4,11 +4,11 @@ export async function onRequest(context) {
   const pathname = url.pathname;
   const method = request.method;
 
-  // 匹配 /api/nav-links/:id
+  // 支持 /api/nav-links/:id 形式
   const idMatch = pathname.match(/^\/api\/nav-links\/(\d+)$/);
   const id = idMatch ? idMatch[1] : undefined;
 
-  // GET 全部或搜索
+  // GET 查询/搜索
   if (method === 'GET' && !id) {
     const search = url.searchParams.get('search')?.trim() || '';
     const tag = url.searchParams.get('tag')?.trim() || '';
