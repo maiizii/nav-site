@@ -4,7 +4,7 @@ let currentCategory = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// TKCall色块
+// 色块
 const colorPalette = [
   "#88af8e", "#41e254", "#f8745c", "#fa6c8d", "#d4efd8", "#edf3ee"
 ];
@@ -14,6 +14,16 @@ function getColorByTitle(title) {
   return colorPalette[code % colorPalette.length];
 }
 
+// 分类名填充至4宽
+function padCategoryName(cat) {
+  if (!cat) return '';
+  const len = Array.from(cat).length;
+  if (len === 4) return cat;
+  if (len === 3) return cat[0] + ' ' + cat[1] + ' ' + cat[2];
+  if (len === 2) return cat[0] + '  ' + cat[1] + '  ';
+  return cat.padEnd(4, ' ');
+}
+
 // 左侧分类栏渲染
 function renderCategories() {
   const catBox = document.getElementById('category-list');
@@ -21,7 +31,7 @@ function renderCategories() {
   allCategories.forEach(cat => {
     const btn = document.createElement('button');
     btn.className = 'category-item' + (currentCategory === cat ? ' active' : '');
-    btn.textContent = cat;
+    btn.textContent = padCategoryName(cat);
     btn.onclick = () => {
       currentCategory = cat;
       currentSearch = '';
