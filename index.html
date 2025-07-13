@@ -4,14 +4,16 @@
   <meta charset="UTF-8" />
   <title>TKCall导航</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="./main.css" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="site-header-inner">
-      <img class="logo-img" src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" />
-      <span class="logo-title">TKCall导航</span>
-      <nav id="category-nav" class="category-nav">
+  <header class="tk-header">
+    <div class="tk-header-inner">
+      <div class="tk-logo">
+        <img class="logo-img" src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" />
+        <span class="site-nav-title">TKCall导航</span>
+      </div>
+      <nav class="tk-menu">
         <a class="tk-menu-link" href="#">日常</a>
         <a class="tk-menu-link" href="#">运营</a>
         <a class="tk-menu-link" href="#">技术</a>
@@ -19,14 +21,20 @@
         <a class="tk-menu-link" href="#">推广</a>
         <a class="tk-menu-link" href="#">交易</a>
       </nav>
-      <input id="search" type="text" class="search-input" placeholder="搜索..." />
+      <div class="header-actions">
+        <div class="search-bar">
+          <input id="search" type="text" placeholder="搜索..." />
+        </div>
+      </div>
     </div>
   </header>
-  <div class="page-main">
-    <aside id="category-list" class="category-list">
-      <!-- 分类侧栏由 main.js 动态插入 -->
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-categories-label">分类</div>
+      <div id="category-list" class="category-list"></div>
+      <!-- 可加TOP按钮等 -->
     </aside>
-    <section id="main" class="main-content">
+    <section class="main-content" id="main">
       <!-- 导航项列表由 main.js 动态插入 -->
     </section>
   </div>
