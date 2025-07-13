@@ -1,11 +1,10 @@
-export async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
+export async function onRequest(context) {
+  // 检查 context.env 是否有 DB
+  if (!context.env || !context.env.DB) {
+    return new Response("D1 not bound", { status: 500 });
+  }
 
-export async function comparePassword(password: string, hash: string): Promise<boolean> {
-  const hashed = await hashPassword(password);
-  return hashed === hash;
+  // 执行一个简单的 SQL 查询
+  const { results } = await context.env.DB.prepare("SELECT 1 as test").first();
+  return new Response("D1 ok, result: " + JSON.stringify(results));
 }
