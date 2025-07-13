@@ -4,7 +4,7 @@ let currentTag = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// 主色系循环，与TKCall主题9风格一致
+// TKCall主题9主色系循环
 const colors = ["#3a6cf6", "#ff9800", "#4caf50", "#8f5ad5", "#ff5b5b", "#00bcd4"];
 function getColorByTitle(title) {
   if (!title) return colors[0];
@@ -37,14 +37,13 @@ function showTooltip(text, card) {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const scrollX = window.scrollX || document.documentElement.scrollLeft;
     let top, left;
-
     const spaceBelow = window.innerHeight - cardRect.bottom;
     if (spaceBelow > tooltipRect.height + 18) {
-      top = cardRect.bottom + 10 + scrollY;
+      top = cardRect.bottom + 8 + scrollY;
       tooltip.classList.remove('nav-tooltip-up');
       tooltip.classList.add('nav-tooltip-down');
     } else {
-      top = cardRect.top - tooltipRect.height - 10 + scrollY;
+      top = cardRect.top - tooltipRect.height - 8 + scrollY;
       tooltip.classList.remove('nav-tooltip-down');
       tooltip.classList.add('nav-tooltip-up');
     }
@@ -125,7 +124,7 @@ function renderLinks(links) {
         }
       };
       card.onmouseleave = function() {
-        tooltipTimer = setTimeout(hideTooltip, 60);
+        tooltipTimer = setTimeout(hideTooltip, 50);
       };
       navList.appendChild(card);
     });
