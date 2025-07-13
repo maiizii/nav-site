@@ -1,4 +1,4 @@
-import { verifyAdmin, getAdminIdFromRequest } from '../../utils/auth';
+import { verifyAdmin, getAdminIdFromRequest } from '../utils/auth';
 import { hash, compare } from 'bcryptjs';
 
 export async function onRequest(context: any) {
