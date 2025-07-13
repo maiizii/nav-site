@@ -365,7 +365,7 @@ body {
   width: 100%;
 }
 
-/* 浮动注释卡片，阴影更淡 */
+/* 浮动注释卡片，浅底深色文字 */
 .nav-tooltip {
   position: absolute;
   z-index: 9999;
@@ -373,13 +373,13 @@ body {
   max-width: 340px;
   max-height: 320px;
   overflow: visible;
-  background: rgba(255,255,255,0.98);
+  background: #fff;
   color: #88af8e;
   border: none;
   border-radius: 13px;
   padding: 0;
   font-size: 1em;
-  box-shadow: 0 4px 16px 0 rgba(60,62,68,0.09), 0 1.5px 8px rgba(60,62,68,0.07);
+  box-shadow: 0 4px 16px 0 rgba(60,62,68,0.12), 0 1.5px 8px rgba(60,62,68,0.07);
   pointer-events: none;
   display: none;
   word-break: break-all;
@@ -393,6 +393,7 @@ body {
   text-align: center;
   font-size: 1.01em;
   color: #88af8e;
+  font-weight: bold;
   word-break: break-all;
   display: flex;
   align-items: center;
