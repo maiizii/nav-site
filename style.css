@@ -6,14 +6,15 @@ body {
 }
 
 .tk-header {
-  background: rgba(255,255,255,0.40); /* 更高透明度，接近截图 */
-  box-shadow: 0 8px 32px 0 rgba(60,62,68,0.18), 0 2px 12px rgba(60,62,68,0.09);
-  padding: 0;
+  background: rgba(255,255,255,0.18); /* 极高透明度，毛玻璃强 */
+  box-shadow: 0 2px 8px 0 rgba(60,62,68,0.10);
   position: sticky;
   top: 0;
   z-index: 30;
-  backdrop-filter: blur(40px) saturate(1.16) brightness(1.10);
-  -webkit-backdrop-filter: blur(40px) saturate(1.16) brightness(1.10);
+  backdrop-filter: blur(24px) saturate(1.12) brightness(1.12);
+  -webkit-backdrop-filter: blur(24px) saturate(1.12) brightness(1.12);
+  border-bottom: 1px solid #e7e8ea;
+  padding: 0;
   transition: background 0.18s;
 }
 .tk-header-inner {
@@ -22,135 +23,113 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 32px;
-  height: 66px;
+  height: 56px;
+  min-height: 56px;
+  box-sizing: border-box;
 }
+
+/* logo区域 */
 .tk-logo {
   display: flex;
   align-items: center;
   flex: none;
 }
 .logo-img {
-  height: 35px;
-  width: 157px;
+  height: 32px;
+  width: auto;
   display: block;
   object-fit: contain;
-  content: url('https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png');
-}
-.site-nav-title {
-  margin-left: 10px;
-  font-size: 1.13em;
-  color: #222;
-  font-weight: 600;
-  letter-spacing: 1px;
-  background: none;
-  border: none;
-  outline: none;
-  cursor: default;
-  display: inline-block;
-  padding: 0 10px 0 0;
-  line-height: 35px;
+  margin-right: 2px;
 }
 
+/* “网站导航”严格参照截图“使用入门”风格 */
+.site-nav-title {
+  display: inline-block;
+  font-size: 14px;
+  font-family: 'PingFang SC','Microsoft Yahei',Arial,sans-serif;
+  color: #222;
+  background: #fff;
+  border: 1px solid #e5e6eb;
+  border-radius: 6px;
+  padding: 0 10px;
+  line-height: 26px;
+  height: 26px;
+  margin-left: 8px;
+  font-weight: 400;
+  box-sizing: border-box;
+  position: relative;
+  top: -1px;
+  letter-spacing: 0.5px;
+}
+
+/* 菜单栏：无色块、无竖线、严格纯文字 */
 .tk-menu {
   display: flex;
   align-items: center;
-  margin-left: 38px;
+  margin-left: 34px;
   gap: 0;
 }
 .tk-menu-link {
   display: inline-block;
   padding: 0 13px;
-  font-size: 1.03em;
-  color: #444;
+  font-size: 17px;
+  color: #222;
   background: none;
   border: none;
   outline: none;
   cursor: pointer;
-  border-radius: 5px;
-  height: 34px;
-  line-height: 34px;
+  border-radius: 0;
+  height: 56px;
+  line-height: 56px;
   text-decoration: none;
-  transition: background .13s, color .13s;
+  transition: color .16s;
+  font-family: inherit;
+  font-weight: 400;
   position: relative;
 }
 .tk-menu-link:hover,
 .tk-menu-link.active {
-  color: #3d8d55;
-  background: #f2f8f4;
+  color: #1ca57d;
+  background: none;
 }
 
+/* 只留最后的设置按钮 */
 .header-actions {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 0;
   min-width: 0;
 }
 .header-btn {
-  background: #f2f2f2;
-  color: #88af8e;
-  border: 1px solid #edf3ee;
-  border-radius: 8px;
-  font-size: 1em;
-  padding: 6px 18px;
-  min-width: 57px;
+  background: none;
+  color: #222;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 0 15px;
+  height: 32px;
+  line-height: 32px;
   cursor: pointer;
-  transition: background 0.14s, color 0.14s, border 0.14s;
-  box-shadow: none;
+  transition: color .16s;
+  font-family: inherit;
 }
 .header-btn:hover {
-  background: #88af8e;
-  color: #fff;
-  border-color: #88af8e;
+  color: #1ca57d;
+  background: none;
+  border: none;
 }
 
-.search-bar {
-  margin-left: 24px;
-  min-width: 200px;
-  max-width: 320px;
-  width: 30%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-.search-bar input {
-  width: 100%;
-  font-size: 1em;
-  padding: 8px 15px;
-  border-radius: 10px;
-  border: 1px solid #edf3ee;
-  background: #f5f5f5;
-  color: #222;
-  outline: none;
-  transition: background 0.15s, border 0.15s;
-  box-shadow: none;
-}
-.search-bar input:focus {
-  background: #fff;
-  border: 1.5px solid #88af8e;
-}
-
-.container {
-  display: flex;
-  max-width: 1200px;
-  margin: 54px auto 0 auto;
-  min-height: 70vh;
-  padding: 0 32px;
-  box-sizing: border-box;
-  gap: 46px;
-}
-
+/* 侧边栏和主内容阴影，主白色区域 */
 .sidebar {
   width: 92px;
   flex: none;
-  margin-right: 0;
   border-radius: 13px;
   background: #fff;
   box-shadow: 0 8px 28px 0 rgba(60,62,68,0.15), 0 1.5px 14px rgba(60,62,68,0.10);
   padding: 32px 0;
-  height: fit-content;
   position: sticky;
-  top: 88px;
+  top: 72px;
   min-height: 220px;
   display: flex;
   flex-direction: column;
@@ -238,7 +217,6 @@ body {
   grid-column: 1;
 }
 
-/* 网站卡片初始辉光，鼠标浮动微动效 */
 .nav-card {
   background: #fff;
   border-radius: 13px;
@@ -334,7 +312,7 @@ body {
   border-radius: 13px;
   padding: 0;
   font-size: 1em;
-  box-shadow: 0 4px 16px 0 rgba(60,62,68,0.11), 0 1.5px 8px rgba(60,62,68,0.09);
+  box-shadow: 0 4px 16px 0 rgba(60,62,68,0.09), 0 1.5px 8px rgba(60,62,68,0.07);
   pointer-events: none;
   display: none;
   word-break: break-all;
@@ -395,6 +373,9 @@ footer {
   }
 }
 @media (max-width: 900px) {
+  .tk-header-inner { padding: 0 8px;}
+  .sidebar { padding: 14px 0;}
+  .tk-menu-link { font-size: 15px; padding: 0 10px;}
   .container {
     flex-direction: column;
     gap: 18px;
@@ -454,15 +435,7 @@ footer {
     padding: 10px 8px;
     gap: 8px;
   }
-  .search-bar {
-    margin: 10px 0 0 0;
-    width: 100%;
-    max-width: 100%;
-  }
-  .container {
-    padding: 0 2px;
-    gap: 12px;
-  }
+  .tk-menu-link { font-size: 14px; }
   .sidebar {
     padding: 8px 0;
     gap: 4px;
