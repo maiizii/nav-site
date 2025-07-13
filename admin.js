@@ -85,7 +85,7 @@ function renderNavTable(list) {
     }
   });
 
-  // 保存/删除按钮事件
+  // 保存（编辑导航项）
   tbody.querySelectorAll('.save-btn').forEach(btn => {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
@@ -96,6 +96,7 @@ function renderNavTable(list) {
         category: document.getElementById(`category-${id}`).value,
         description: document.getElementById(`desc-${id}`).value,
         icon: document.getElementById(`icon-${id}`).value
+        // sort 字段不在编辑时提交
       };
       await fetch(SAVE_API, {
         method: 'POST',
@@ -105,6 +106,8 @@ function renderNavTable(list) {
       loadNavLinks();
     };
   });
+
+  // 删除
   tbody.querySelectorAll('.del-btn').forEach(btn => {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
