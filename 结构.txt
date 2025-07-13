@@ -1,0 +1,26 @@
+nav/
+├── cloudflare/
+│   ├── schema.sql           # D1 数据库初始化表结构
+│   ├── d1.ts                # D1 查询工具
+│   ├── kv.ts                # KV 工具
+├── src/
+│   ├── pages/
+│   │   ├── index.tsx        # 首页导航展示
+│   │   ├── admin.tsx        # 管理后台页面
+│   ├── components/          # 组件
+│   ├── utils/               # 工具函数
+│   ├── styles/              # Tailwind CSS
+│   ├── types/               # TypeScript 类型定义
+│   ├── api/
+│   │   ├── nav/             # 导航相关 API
+│   │   │   ├── list.ts      # 获取导航列表
+│   │   │   ├── add.ts       # 新增导航
+│   │   │   ├── delete.ts    # 删除导航
+│   │   │   ├── update.ts    # 修改导航
+│   │   ├── auth/            # 登录/鉴权
+│   │   │   ├── login.ts
+├── public/                  # 静态资源
+├── README.md                # 项目说明
+├── package.json
+├── tsconfig.json
+└── wrangler.toml            # Cloudflare Pages/Workers 配置

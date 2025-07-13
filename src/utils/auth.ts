@@ -1,0 +1,22 @@
+const AUTH_COOKIE_NAME = 'admin_token';
+
+export function getAdminIdFromRequest(request) {
+  const cookie = request.headers.get('Cookie') || '';
+  const match = cookie.match(new RegExp(`${AUTH_COOKIE_NAME}=([^;]+)`));
+  if (!match) return null;
+  try {
+    const decoded = Buffer.from(match[1], 'base64').toString();
+    const [adminId] = decoded.split(':');
+    return parseInt(adminId, 10) || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function verifyAdmin(request, env) {
+  const adminId = getAdminIdFromRequest(request);
+  if (!adminId) return false;
+  // 检查数据库是否有此 id
+  const admin = await env.DB.prepare('SELECT id FROM admin WHERE id = ?').bind(adminId).first();
+  return !!admin;
+}

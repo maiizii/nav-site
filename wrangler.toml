@@ -1,0 +1,10 @@
+name = "nav-site"
+compatibility_date = "2023-07-13"
+
+[env.production]
+d1_databases = [
+  { binding = "DB", database_name = "nav_site_db", database_id = "xxx" }
+]
+kv_namespaces = [
+  { binding = "KV", id = "yyy" }
+]
