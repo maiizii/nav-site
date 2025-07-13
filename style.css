@@ -93,7 +93,7 @@ body {
   background: none;
 }
 
-/* 只留最后的设置按钮 */
+/* header只保留设置按钮 */
 .header-actions {
   margin-left: auto;
   display: flex;
@@ -118,6 +118,33 @@ body {
   color: #1ca57d;
   background: none;
   border: none;
+}
+
+/* 搜索框正常显示 */
+.search-bar {
+  margin-left: 24px;
+  min-width: 200px;
+  max-width: 320px;
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.search-bar input {
+  width: 100%;
+  font-size: 1em;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid #edf3ee;
+  background: #f5f5f5;
+  color: #222;
+  outline: none;
+  transition: background 0.15s, border 0.15s;
+  box-shadow: none;
+}
+.search-bar input:focus {
+  background: #fff;
+  border: 1.5px solid #88af8e;
 }
 
 /* 侧边栏和主内容阴影，主白色区域 */
