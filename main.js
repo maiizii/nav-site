@@ -1,4 +1,5 @@
-// 适配 style.css 结构的 main.js
+// 适配 style.css 结构，分类侧栏按 sort 排序显示
+
 let allLinks = [];
 let allCategories = [];
 let currentCategory = '';
@@ -13,7 +14,7 @@ async function loadCategories() {
   renderCategoryList();
 }
 
-// 侧栏分类渲染（纵向菜单，和页头无关）
+// 侧栏分类渲染，按 sort 字段升序排序
 function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
@@ -28,7 +29,14 @@ function renderCategoryList() {
   };
   catBox.appendChild(allBtn);
 
-  allCategories.forEach(cat => {
+  // 按 sort 字段升序排序
+  const sortedCats = [...allCategories].sort((a, b) => {
+    const sa = typeof a.sort === 'number' ? a.sort : 9999;
+    const sb = typeof b.sort === 'number' ? b.sort : 9999;
+    return sa - sb;
+  });
+
+  sortedCats.forEach(cat => {
     const btn = document.createElement('button');
     btn.className = 'category-item' + (currentCategory === cat.name ? ' active' : '');
     btn.textContent = cat.name;
