@@ -13,14 +13,35 @@ function getColorByTitle(title) {
   return colorPalette[code % colorPalette.length];
 }
 
-// 分类名填充至4宽
-function padCategoryName(cat) {
-  if (!cat) return '';
-  const len = Array.from(cat).length;
-  if (len === 4) return cat;
-  if (len === 3) return cat[0] + ' ' + cat[1] + ' ' + cat[2];
-  if (len === 2) return cat[0] + '  ' + cat[1] + '  ';
-  return cat.padEnd(4, ' ');
+// 分类栏渲染（无需补空格，始终居中）
+function renderCategories() {
+  const catBox = document.getElementById('category-list');
+  catBox.innerHTML = '';
+  allCategories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'category-item' + (currentCategory === cat ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => {
+      currentCategory = cat;
+      currentSearch = '';
+      document.getElementById('search').value = '';
+      renderCategories();
+      renderLinks(allLinks);
+    };
+    catBox.appendChild(btn);
+  });
+  // “全部”按钮
+  if (currentCategory) {
+    const allBtn = document.createElement('button');
+    allBtn.className = 'category-item';
+    allBtn.textContent = '全部';
+    allBtn.onclick = () => {
+      currentCategory = '';
+      renderCategories();
+      renderLinks(allLinks);
+    };
+    catBox.insertBefore(allBtn, catBox.firstChild);
+  }
 }
 
 // 浮动注释卡片
@@ -69,37 +90,6 @@ function hideTooltip() {
   if (tooltip) tooltip.style.display = 'none';
 }
 
-// 分类栏渲染
-function renderCategories() {
-  const catBox = document.getElementById('category-list');
-  catBox.innerHTML = '';
-  allCategories.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className = 'category-item' + (currentCategory === cat ? ' active' : '');
-    btn.textContent = padCategoryName(cat);
-    btn.onclick = () => {
-      currentCategory = cat;
-      currentSearch = '';
-      document.getElementById('search').value = '';
-      renderCategories();
-      renderLinks(allLinks);
-    };
-    catBox.appendChild(btn);
-  });
-  // “全部”按钮
-  if (currentCategory) {
-    const allBtn = document.createElement('button');
-    allBtn.className = 'category-item';
-    allBtn.textContent = '全部';
-    allBtn.onclick = () => {
-      currentCategory = '';
-      renderCategories();
-      renderLinks(allLinks);
-    };
-    catBox.insertBefore(allBtn, catBox.firstChild);
-  }
-}
-
 function renderLinks(links) {
   const main = document.getElementById('main');
   main.innerHTML = '';
@@ -141,7 +131,6 @@ function renderLinks(links) {
           </div>
         </a>
       `;
-      // 悬浮注释
       card.onmouseenter = function() {
         if (link.description) {
           clearTimeout(tooltipTimer);
