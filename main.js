@@ -2,6 +2,7 @@ let allLinks = [];
 let allCategories = [];
 let currentTag = '';
 let currentSearch = '';
+let tooltipTimeout = null;
 
 function createTooltip() {
   let tooltip = document.getElementById('nav-tooltip');
@@ -14,23 +15,43 @@ function createTooltip() {
   return tooltip;
 }
 
-function showTooltip(text, event) {
+function showTooltip(text, card) {
   const tooltip = createTooltip();
-  tooltip.innerHTML = text.replace(/\n/g, '<br>');
+  tooltip.innerHTML = `<div class="nav-tooltip-arrow"></div><div class="nav-tooltip-inner">${text.replace(/\n/g, '<br>')}</div>`;
   tooltip.style.display = 'block';
-  const padding = 14;
-  let left = event.clientX + padding;
-  let top = event.clientY + padding;
-  const rect = tooltip.getBoundingClientRect();
-  if (left + rect.width > window.innerWidth) left = window.innerWidth - rect.width - padding;
-  if (top + rect.height > window.innerHeight) top = window.innerHeight - rect.height - padding;
-  tooltip.style.left = left + 'px';
-  tooltip.style.top = top + 'px';
+
+  // 定位到卡片正下方，超出底部则显示在上方
+  const cardRect = card.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const scrollY = window.scrollY || document.documentElement.scrollTop;
+  const scrollX = window.scrollX || document.documentElement.scrollLeft;
+
+  let top, left;
+  if (cardRect.bottom + 18 + tooltipRect.height < window.innerHeight) {
+    // 下方显示
+    top = cardRect.bottom + 12 + scrollY;
+    tooltip.classList.remove('nav-tooltip-up');
+    tooltip.classList.add('nav-tooltip-down');
+  } else {
+    // 上方显示
+    top = cardRect.top - tooltipRect.height - 12 + scrollY;
+    tooltip.classList.remove('nav-tooltip-down');
+    tooltip.classList.add('nav-tooltip-up');
+  }
+  left = cardRect.left + cardRect.width / 2 - tooltipRect.width / 2 + scrollX;
+  // 边界调整
+  if (left < 8) left = 8;
+  if (left + tooltipRect.width > window.innerWidth - 8) left = window.innerWidth - tooltipRect.width - 8;
+  tooltip.style.top = `${top}px`;
+  tooltip.style.left = `${left}px`;
 }
 
 function hideTooltip() {
   const tooltip = document.getElementById('nav-tooltip');
-  if (tooltip) tooltip.style.display = 'none';
+  if (tooltip) {
+    tooltip.style.display = 'none';
+    tooltip.classList.remove('nav-tooltip-up', 'nav-tooltip-down');
+  }
 }
 
 function renderTags() {
@@ -91,12 +112,18 @@ function renderLinks(links) {
       `;
       // 浮动描述块事件
       card.onmouseenter = function(e) {
-        if (link.description) showTooltip(link.description, e);
+        if (link.description) {
+          clearTimeout(tooltipTimeout);
+          showTooltip(link.description, card);
+        }
       };
-      card.onmousemove = function(e) {
-        if (link.description) showTooltip(link.description, e);
+      card.onmouseleave = function() {
+        tooltipTimeout = setTimeout(hideTooltip, 70);
       };
-      card.onmouseleave = hideTooltip;
+      card.onmousemove = function() {
+        // 保证鼠标在卡片内不会消失
+        clearTimeout(tooltipTimeout);
+      };
       navList.appendChild(card);
     });
     main.appendChild(section);
