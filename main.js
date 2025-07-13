@@ -1,258 +1,152 @@
-body {
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background: #f6f6f9;
-  margin: 0;
-  color: #222;
-}
-header {
-  background: #fff;
-  box-shadow: 0 1px 10px rgba(120,120,120,0.06);
-  padding: 24px 0 10px 0;
-  text-align: center;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.site-title {
-  font-size: 2.1em;
-  font-weight: 700;
-  margin-left: 10px;
-}
-.search-bar {
-  margin: 18px auto 0 auto;
-  max-width: 400px;
-}
-.search-bar input {
-  width: 100%;
-  font-size: 1.05em;
-  padding: 9px 14px;
-  border-radius: 7px;
-  border: 1px solid #eee;
-  box-shadow: 0 1px 4px rgba(120,120,120,0.04);
-  outline: none;
-  transition: border-color 0.2s;
-}
-.search-bar input:focus {
-  border-color: #ff734e;
-}
-.tags-bar {
-  margin: 18px auto 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-.tag-btn {
-  background: #ff734e;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 15px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.tag-btn.active, .tag-btn:hover {
-  background: #ffab91;
-  color: #fff;
-}
-.tag-btn.clear {
-  background: #eee;
-  color: #222;
-}
-main {
-  max-width: 1100px;
-  margin: 36px auto 0 auto;
-  background: #fff;
-  padding: 24px 18px;
-  border-radius: 16px;
-  box-shadow: 0 2px 14px rgba(240,133,100,0.06);
-}
-.group-section {
-  margin-bottom: 38px;
-}
-.group-title {
-  font-size: 1.35em;
-  font-weight: 700;
-  color: #ff734e;
-  margin-bottom: 14px;
-  margin-top: 0;
-  letter-spacing: 1px;
-}
-.nav-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(230px,1fr));
-  gap: 22px;
-  padding: 0;
-}
-.nav-card {
-  background: #fff8f6;
-  border-radius: 9px;
-  padding: 16px 16px 15px 16px;
-  box-shadow: 0 1px 6px rgba(240,133,100,0.07);
-  transition: box-shadow 0.13s, transform 0.13s;
-  animation: fadeInCard 0.5s;
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-}
-.nav-card:hover {
-  box-shadow: 0 4px 12px rgba(240,133,100,0.12);
-  transform: translateY(-2px) scale(1.025);
-}
-@keyframes fadeInCard {
-  from { opacity: 0; transform: scale(0.98);}
-  to { opacity: 1; transform: scale(1);}
-}
-.nav-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  vertical-align: middle;
-  margin-right: 8px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(120,120,120,0.06);
-  object-fit: cover;
-}
-.nav-icon-default {
-  display: inline-block;
-  width: 32px; height: 32px;
-  background: #ff734e;
-  color: #fff;
-  font-size: 1.2em;
-  border-radius: 8px;
-  text-align: center;
-  line-height: 32px;
-  margin-right: 8px;
-  font-weight: bold;
-  box-shadow: 0 1px 4px rgba(120,120,120,0.06);
-}
-.nav-card a {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-}
-.nav-card strong {
-  font-size: 1.05em;
-  font-weight: 700;
-}
-.nav-desc {
-  font-size: 0.96em;
-  color: #775;
-  margin: 0;
-  margin-left: 7px;
-  flex: 1;
-  max-width: 140px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: left;
-  display: flex;
-  align-items: center; /* 垂直居中 */
-  /* 省略号在前方显示，优先显示结尾内容 */
-  direction: rtl;
-  unicode-bidi: plaintext;
+let allLinks = [];
+let allCategories = [];
+let currentTag = '';
+let currentSearch = '';
+let tooltipTimer = null;
+
+function createTooltip() {
+  let tooltip = document.getElementById('nav-tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'nav-tooltip';
+    tooltip.className = 'nav-tooltip';
+    document.body.appendChild(tooltip);
+  }
+  return tooltip;
 }
 
-/* 浮层与箭头（绝对定位，内容padding不挤压文字） */
-.nav-tooltip {
-  position: absolute;
-  z-index: 9999;
-  min-width: 220px;
-  max-width: 360px;
-  max-height: 320px;
-  overflow: auto;
-  background: #fff;
-  color: #222;
-  border: none;
-  border-radius: 20px;
-  padding: 0;
-  font-size: 1em;
-  box-shadow: 0 12px 38px rgba(240,133,100,0.15), 0 3px 12px rgba(120,120,120,0.08);
-  pointer-events: none;
-  display: none;
-  word-break: break-all;
-  line-height: 1.6;
-  transition: opacity 0.13s;
+function showTooltip(text, card) {
+  const tooltip = createTooltip();
+  tooltip.innerHTML = `
+    <div class="nav-tooltip-arrow"></div>
+    <div class="nav-tooltip-content">${text.replace(/\n/g, '<br>')}</div>
+  `;
+  tooltip.style.display = 'block';
+
+  setTimeout(() => {
+    const cardRect = card.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const scrollX = window.scrollX || document.documentElement.scrollLeft;
+    let top, left;
+
+    const spaceBelow = window.innerHeight - cardRect.bottom;
+    const spaceAbove = cardRect.top;
+
+    if (spaceBelow > tooltipRect.height + 18) {
+      top = cardRect.bottom + 10 + scrollY;
+      tooltip.classList.remove('nav-tooltip-up');
+      tooltip.classList.add('nav-tooltip-down');
+    } else {
+      top = cardRect.top - tooltipRect.height - 10 + scrollY;
+      tooltip.classList.remove('nav-tooltip-down');
+      tooltip.classList.add('nav-tooltip-up');
+    }
+    left = cardRect.left + cardRect.width / 2 - tooltipRect.width / 2 + scrollX;
+    left = Math.max(10, Math.min(left, window.innerWidth - tooltipRect.width - 10));
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+  }, 0);
 }
 
-.nav-tooltip-content {
-  padding: 16px 18px;
-  text-align: center;
-  font-size: 1.08em;
-  color: #443;
-  word-break: break-all;
+function hideTooltip() {
+  const tooltip = document.getElementById('nav-tooltip');
+  if (tooltip) tooltip.style.display = 'none';
 }
 
-/* 纯白三角箭头，无特效 */
-.nav-tooltip-arrow {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  z-index: 2;
-  pointer-events: none;
+function renderTags() {
+  const tagsBar = document.getElementById('tags');
+  tagsBar.innerHTML = '';
+  allCategories.forEach(cate => {
+    const tagBtn = document.createElement('button');
+    tagBtn.className = 'tag-btn' + (currentTag === cate ? ' active' : '');
+    tagBtn.textContent = cate;
+    tagBtn.onclick = () => {
+      currentTag = cate;
+      currentSearch = '';
+      document.getElementById('search').value = '';
+      loadAndRenderLinks();
+    };
+    tagsBar.appendChild(tagBtn);
+  });
+  if (currentTag) {
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'tag-btn clear';
+    clearBtn.textContent = '全部';
+    clearBtn.onclick = () => {
+      currentTag = '';
+      loadAndRenderLinks();
+    };
+    tagsBar.insertBefore(clearBtn, tagsBar.firstChild);
+  }
 }
 
-/* 下方浮层，箭头顶部与浮层顶部重合 */
-.nav-tooltip-down .nav-tooltip-arrow {
-  top: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 14px solid #fff;
+function renderLinks(links) {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const groups = {};
+  links.forEach(link => {
+    const cat = link.category || '未分组';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(link);
+  });
+
+  Object.entries(groups).forEach(([cat, items]) => {
+    const section = document.createElement('section');
+    section.className = 'group-section';
+    section.innerHTML = `<h2 class="group-title">${cat}</h2><div class="nav-list"></div>`;
+    const navList = section.querySelector('.nav-list');
+    items.forEach(link => {
+      const card = document.createElement('div');
+      card.className = 'nav-card';
+      card.innerHTML = `
+        <a href="${link.url}" target="_blank" rel="noopener">
+          ${
+            link.icon
+              ? `<img src="${link.icon}" alt="icon" class="nav-icon" onerror="this.style.display='none'">`
+              : `<span class="nav-icon-default">${(link.title || '').charAt(0).toUpperCase()}</span>`
+          }
+          <strong>${link.title}</strong>
+          <p class="nav-desc">${link.description || ''}</p>
+        </a>
+      `;
+      card.onmouseenter = function() {
+        if (link.description) {
+          clearTimeout(tooltipTimer);
+          showTooltip(link.description, card);
+        }
+      };
+      card.onmouseleave = function() {
+        tooltipTimer = setTimeout(hideTooltip, 60);
+      };
+      navList.appendChild(card);
+    });
+    main.appendChild(section);
+  });
 }
 
-/* 上方浮层，箭头底部与浮层底部重合 */
-.nav-tooltip-up .nav-tooltip-arrow {
-  bottom: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 14px solid #fff;
+async function loadAllLinks() {
+  let url = '/api/nav-links';
+  if (currentSearch) {
+    url += '?search=' + encodeURIComponent(currentSearch);
+  } else if (currentTag) {
+    url += '?tag=' + encodeURIComponent(currentTag);
+  }
+  const resp = await fetch(url);
+  allLinks = await resp.json();
+  allCategories = Array.from(new Set(allLinks.map(l => l.category).filter(Boolean)));
 }
 
-.nav-tooltip-down { padding-top: 14px; }
-.nav-tooltip-up   { padding-bottom: 14px; }
+async function loadAndRenderLinks() {
+  await loadAllLinks();
+  renderTags();
+  renderLinks(allLinks);
+}
 
-footer {
-  text-align: center;
-  font-size: 0.97em;
-  color: #888;
-  margin: 48px 0 14px 0;
-}
-@media (max-width: 680px) {
-  main {
-    padding: 4px 2px;
-    border-radius: 0;
-    box-shadow: none;
-    max-width: 100%;
-  }
-  .nav-list {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  .group-section {
-    margin-bottom: 24px;
-  }
-  .site-title {
-    font-size: 1.2em;
-  }
-}
-@media (max-width: 400px) {
-  .nav-card {
-    padding: 10px 6px;
-  }
-  .nav-icon, .nav-icon-default {
-    width: 26px; height: 26px; line-height: 26px; font-size: 1em;
-  }
-  .nav-tooltip-content {
-    padding: 12px 10px 8px 10px;
-    font-size: 0.98em;
-  }
-}
+document.getElementById('search').oninput = e => {
+  currentSearch = e.target.value.trim();
+  currentTag = '';
+  loadAndRenderLinks();
+};
+
+loadAndRenderLinks();
