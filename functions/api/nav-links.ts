@@ -1,15 +1,10 @@
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const pathname = url.pathname;
   const method = request.method;
 
-  // 支持 /api/nav-links/:id 形式
-  const idMatch = pathname.match(/^\/api\/nav-links\/(\d+)$/);
-  const id = idMatch ? idMatch[1] : undefined;
-
-  // GET 查询/搜索
-  if (method === 'GET' && !id) {
+  // GET 全部
+  if (method === 'GET') {
     const search = url.searchParams.get('search')?.trim() || '';
     const tag = url.searchParams.get('tag')?.trim() || '';
     let sql = 'SELECT * FROM nav_links';
@@ -26,8 +21,8 @@ export async function onRequest(context) {
     return Response.json(res.results);
   }
 
-  // 新增
-  if (method === 'POST' && !id) {
+  // POST 新增一条
+  if (method === 'POST') {
     const body = await request.json();
     const { title, url: linkUrl, category, description, icon } = body;
     await env.DB.prepare(
@@ -36,22 +31,5 @@ export async function onRequest(context) {
     return Response.json({ ok: true });
   }
 
-  // 编辑
-  if (method === 'PUT' && id) {
-    const body = await request.json();
-    const { title, url: linkUrl, category, description, icon } = body;
-    await env.DB.prepare(
-      'UPDATE nav_links SET title=?, url=?, category=?, description=?, icon=? WHERE id=?'
-    ).bind(title, linkUrl, category, description, icon, id).run();
-    return Response.json({ ok: true });
-  }
-
-  // 删除
-  if (method === 'DELETE' && id) {
-    await env.DB.prepare('DELETE FROM nav_links WHERE id=?').bind(id).run();
-    return Response.json({ ok: true });
-  }
-
-  // 兜底404
-  return new Response('Not Found', { status: 404 });
+  return new Response('Method Not Allowed', { status: 405 });
 }
