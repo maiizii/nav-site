@@ -1,5 +1,5 @@
 body {
-  background: #f2f2f2 url('https://cdn.tkcall-upload-us.s3.dualstack.us-west-1.amazonaws.com/original/1X/bf14c792424aa926643bf39cc603e6d8128e62f9.png') repeat;
+  background: #f2f2f2 url('./background.png') repeat;
   color: #222;
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
   margin: 0;
