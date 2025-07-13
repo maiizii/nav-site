@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>导航首页</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>123.SS 导航站</title>
+  <meta name="viewport" content="width=960" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <header>
-    <h1>我的导航站</h1>
-    <nav>
-      <a href="login.html">管理员登录</a>
-      <a href="admin.html">管理后台</a>
-      <!-- 可加更多页面 -->
-    </nav>
+    <div class="logo">
+      <img src="./logo.svg" alt="logo" style="width:40px;height:40px;vertical-align:middle;">
+      <span style="font-size:2em;font-weight:bold;">123<span style="color:#ff734e">.SS</span></span>
+    </div>
   </header>
   <main>
-    <ul>
-      <!-- 导航内容可通过 JS 或静态写死 -->
-      <li><a href="https://example.com">示例链接</a></li>
-    </ul>
+    <section>
+      <h1>常用导航</h1>
+      <div id="nav-list" class="nav-list"></div>
+    </section>
   </main>
   <footer>
-    <p>&copy; 2025 我的导航站</p>
+    <p>© 2025 123.SS All Rights Reserved</p>
   </footer>
+  <script src="./main.js"></script>
 </body>
 </html>
