@@ -155,11 +155,12 @@ main {
   text-align: center;
   display: flex;
   align-items: center; /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
 }
 
 /* 浮动卡片及箭头修正 */
 .nav-tooltip {
-  position: absolute;
+  position: relative; /* 关键：为绝对定位箭头提供参考 */
   z-index: 9999;
   min-width: 220px;
   max-width: 360px;
@@ -180,10 +181,11 @@ main {
 }
 
 .nav-tooltip-content {
-  padding: 20px 22px 16px 22px;
-  text-align: left;
+  padding: 18px 18px;
+  text-align: center;
   font-size: 1.08em;
   color: #443;
+  word-break: break-all;
 }
 
 /* 纯白三角箭头，无任何特效，绝对定位贴边 */
