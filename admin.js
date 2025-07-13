@@ -1,9 +1,13 @@
-const API = '/api/nav-links';
+const API = "/api/nav-links/list";
+const SAVE_API = "/api/nav-links/update";
+const DEL_API = "/api/nav-links/delete";
+const ADD_API = "/api/nav-links/add";
+const SORT_API = "/api/nav-links/sort";
 
 // 渲染导航列表为表格
 async function loadNavLinks() {
   const res = await fetch(API);
-  const links = await res.json();
+  const links = (await res.json()).data || [];
   renderNavTable(links);
 }
 
@@ -13,7 +17,7 @@ function renderNavTable(list) {
     <table class="admin-table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th style="width:48px;">排序</th>
           <th>名称</th>
           <th>链接</th>
           <th>分类</th>
@@ -41,8 +45,12 @@ function renderNavTable(list) {
   const tbody = document.getElementById('nav-tbody');
   list.forEach(nav => {
     const tr = document.createElement('tr');
+    tr.setAttribute('data-id', nav.id); // 用于排序
     tr.innerHTML = `
-      <td>${nav.id}</td>
+      <td>
+        <span class="drag-handle" style="cursor:grab;">&#9776;</span>
+        ${nav.sort || ""}
+      </td>
       <td><input type="text" value="${nav.title}" id="title-${nav.id}" /></td>
       <td><input type="url" value="${nav.url}" id="url-${nav.id}" /></td>
       <td><input type="text" value="${nav.category || ''}" id="category-${nav.id}" /></td>
@@ -56,50 +64,74 @@ function renderNavTable(list) {
     tbody.appendChild(tr);
   });
 
-  // 行编辑保存
-  document.querySelectorAll('.save-btn').forEach(btn => {
-    btn.onclick = async function() {
-      const id = btn.dataset.id;
-      const title = document.getElementById(`title-${id}`).value.trim();
-      const url = document.getElementById(`url-${id}`).value.trim();
-      const category = document.getElementById(`category-${id}`).value.trim();
-      const description = document.getElementById(`desc-${id}`).value.trim();
-      const icon = document.getElementById(`icon-${id}`).value.trim();
-      if (!title || !url) return alert('名称和链接必填');
-      await fetch(`${API}/${id}`, {
-        method: 'PUT',
+  // 拖拽排序
+  Sortable.create(tbody, {
+    animation: 150,
+    handle: '.drag-handle',
+    onEnd: function () {
+      const newOrder = [];
+      tbody.querySelectorAll('tr').forEach((tr, idx) => {
+        const id = tr.getAttribute('data-id');
+        if (id) newOrder.push({ id: Number(id), sort: idx + 1 });
+      });
+      fetch(SORT_API, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, url, category, description, icon })
+        body: JSON.stringify(newOrder)
+      }).then(res => res.json()).then(data => {
+        // 排序保存成功后刷新
+        loadNavLinks();
+      });
+    }
+  });
+
+  // 保存/删除按钮事件
+  tbody.querySelectorAll('.save-btn').forEach(btn => {
+    btn.onclick = async (e) => {
+      const id = btn.getAttribute('data-id');
+      const payload = {
+        id,
+        title: document.getElementById(`title-${id}`).value,
+        url: document.getElementById(`url-${id}`).value,
+        category: document.getElementById(`category-${id}`).value,
+        description: document.getElementById(`desc-${id}`).value,
+        icon: document.getElementById(`icon-${id}`).value
+      };
+      await fetch(SAVE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      loadNavLinks();
+    };
+  });
+  tbody.querySelectorAll('.del-btn').forEach(btn => {
+    btn.onclick = async (e) => {
+      const id = btn.getAttribute('data-id');
+      if (!confirm('确定要删除吗？')) return;
+      await fetch(DEL_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
       });
       loadNavLinks();
     };
   });
 
-  // 删除
-  document.querySelectorAll('.del-btn').forEach(btn => {
-    btn.onclick = async function() {
-      const id = btn.dataset.id;
-      if (confirm('确定删除？')) {
-        await fetch(`${API}/${id}`, { method: 'DELETE' });
-        loadNavLinks();
-      }
-    };
-  });
-
   // 新增
-  document.getElementById('add-btn').onclick = async function() {
-    const title = document.getElementById('add-title').value.trim();
-    const url = document.getElementById('add-url').value.trim();
-    const category = document.getElementById('add-category').value.trim();
-    const description = document.getElementById('add-description').value.trim();
-    const icon = document.getElementById('add-icon').value.trim();
-    if (!title || !url) return alert('名称和链接必填');
-    await fetch(API, {
+  document.getElementById('add-btn').onclick = async () => {
+    const payload = {
+      title: document.getElementById('add-title').value,
+      url: document.getElementById('add-url').value,
+      category: document.getElementById('add-category').value,
+      description: document.getElementById('add-description').value,
+      icon: document.getElementById('add-icon').value
+    };
+    await fetch(ADD_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, url, category, description, icon })
+      body: JSON.stringify(payload)
     });
-    // 清空输入
     document.getElementById('add-title').value = '';
     document.getElementById('add-url').value = '';
     document.getElementById('add-category').value = '';
@@ -109,5 +141,4 @@ function renderNavTable(list) {
   };
 }
 
-// 初始化
-loadNavLinks();
+document.addEventListener('DOMContentLoaded', loadNavLinks);
