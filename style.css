@@ -1,10 +1,8 @@
 body {
-  font-family: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-  margin: 0;
+  background: #f6f6f8 url('https://tkcall-upload-us.s3.dualstack.us-west-1.amazonaws.com/original/1X/bf14c792424aa926643bf39cc603e6d8128e62f9.png') repeat;
   color: #222b45;
-  background: linear-gradient(120deg, #3a6cf6 0%, #8f5ad5 100%);
-  min-height: 100vh;
-  letter-spacing: 0.02em;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  margin: 0;
 }
 
 header {
@@ -22,12 +20,12 @@ header {
   font-size: 2em;
   font-weight: 700;
   margin-left: 12px;
-  color: #fff;
-  text-shadow: 0 2px 8px rgba(58,108,246,0.19);
+  color: #222b45;
+  letter-spacing: 0.03em;
 }
 
 .search-bar {
-  margin: 30px auto 0 auto;
+  margin: 32px auto 0 auto;
   max-width: 420px;
 }
 .search-bar input {
@@ -35,16 +33,17 @@ header {
   font-size: 1.08em;
   padding: 13px 19px;
   border-radius: 13px;
-  border: none;
-  background: rgba(255,255,255,0.92);
+  border: 1px solid #e4e6ec;
+  background: #f8f9fb;
   color: #222b45;
-  box-shadow: 0 2px 12px rgba(58,108,246,0.13);
+  box-shadow: 0 2px 12px rgba(60,70,130,0.06);
   outline: none;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, border 0.2s;
 }
 .search-bar input:focus {
-  background: #f2f6ff;
-  box-shadow: 0 2px 16px #3a6cf642;
+  background: #fff;
+  border: 1px solid #3a6cf6;
+  box-shadow: 0 2px 16px #3a6cf61a;
 }
 
 .tags-bar {
@@ -55,48 +54,48 @@ header {
   justify-content: center;
 }
 .tag-btn {
-  background: linear-gradient(90deg,#3a6cf6 0,#8f5ad5 100%);
-  color: #fff;
-  border: none;
-  border-radius: 19px;
+  background: #f7f8fa;
+  color: #3a6cf6;
+  border: 1px solid #e3e6ec;
+  border-radius: 17px;
   padding: 7px 22px;
   font-size: 1em;
   cursor: pointer;
-  box-shadow: 0 1px 8px #3a6cf641;
-  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 8px #3a6cf605;
+  transition: background 0.15s, box-shadow 0.15s, color 0.15s, border 0.15s;
 }
 .tag-btn.active, .tag-btn:hover {
-  background: linear-gradient(90deg,#8f5ad5 0,#3a6cf6 100%);
+  background: #e6edfb;
   color: #fff;
-  box-shadow: 0 2px 16px #8f5ad533;
+  border: 1px solid #3a6cf6;
+  box-shadow: 0 2px 10px #3a6cf622;
 }
 .tag-btn.clear {
   background: #fff;
   color: #3a6cf6;
-  border: none;
-  box-shadow: 0 1px 8px #3a6cf641;
+  border: 1px solid #e3e6ec;
 }
 
 main {
   max-width: 1100px;
   margin: 44px auto 0 auto;
-  background: rgba(255,255,255,0.92);
+  background: #fff;
   padding: 32px 20px;
-  border-radius: 28px;
-  box-shadow: 0 6px 32px #3a6cf642, 0 1px 6px #8f5ad513;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(60,70,130,0.08);
 }
 
 .group-section {
   margin-bottom: 42px;
 }
 .group-title {
-  font-size: 1.38em;
+  font-size: 1.25em;
   font-weight: 700;
   color: #3a6cf6;
   margin-bottom: 18px;
   margin-top: 0;
   letter-spacing: 1px;
-  text-shadow: 0 2px 6px #3a6cf641;
+  text-shadow: 0 2px 6px #3a6cf608;
 }
 .nav-list {
   display: grid;
@@ -107,55 +106,44 @@ main {
 
 .nav-card {
   background: #fff;
-  border-radius: 18px;
-  padding: 18px 18px 17px 18px;
-  min-height: 0;
-  box-shadow: 0 2px 12px #3a6cf641;
-  transition: box-shadow 0.13s, transform 0.13s;
-  animation: fadeInCard 0.6s;
-  position: relative;
-  z-index: 1;
+  border-radius: 13px;
+  box-shadow: 0 1px 8px rgba(60,70,130,0.07);
   display: flex;
   align-items: center;
+  transition: box-shadow 0.13s, transform 0.13s;
+  position: relative;
+  z-index: 1;
 }
 .nav-card:hover {
-  box-shadow: 0 8px 24px #3a6cf642, 0 2px 10px #8f5ad522;
-  transform: translateY(-2px) scale(1.035);
-  background: #f2f6ff;
-}
-
-@keyframes fadeInCard {
-  from { opacity: 0; transform: scale(0.97);}
-  to { opacity: 1; transform: scale(1);}
+  box-shadow: 0 6px 24px rgba(60,70,130,0.15);
+  transform: translateY(-2px) scale(1.025);
+  background: #f8faff;
 }
 
 .nav-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   vertical-align: middle;
-  margin-right: 17px;
-  background: #f2f6ff;
-  box-shadow: 0 1px 8px #3a6cf641;
+  margin-right: 15px;
+  background: #f3f6fb;
   object-fit: cover;
   flex-shrink: 0;
-  border: 2px solid #3a6cf6;
+  border: 1px solid #e3e6ec;
 }
-
 .nav-icon-default {
   display: inline-block;
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg,#3a6cf6 0%,#8f5ad5 100%);
+  width: 38px; height: 38px;
+  background: #3a6cf6;
   color: #fff;
-  font-size: 1.15em;
-  border-radius: 11px;
+  font-size: 1.2em;
+  border-radius: 8px;
   text-align: center;
-  line-height: 40px;
-  margin-right: 17px;
+  line-height: 38px;
+  margin-right: 15px;
   font-weight: bold;
-  box-shadow: 0 1px 8px #3a6cf641;
   flex-shrink: 0;
-  border: 2px solid #3a6cf6;
+  border: 1px solid #e3e6ec;
 }
 .nav-card a {
   text-decoration: none;
@@ -172,7 +160,7 @@ main {
   flex: 1;
 }
 .nav-title {
-  font-size: 1.09em;
+  font-size: 1.07em;
   font-weight: 700;
   color: #222b45;
   margin: 0;
@@ -183,9 +171,9 @@ main {
   text-overflow: ellipsis;
 }
 .nav-desc {
-  font-size: 0.99em;
+  font-size: 0.98em;
   color: #8f5ad5;
-  margin: 5px 0 0 0;
+  margin: 4px 0 0 0;
   line-height: 1.4;
   text-align: left;
   white-space: nowrap;
@@ -204,10 +192,10 @@ main {
   background: #fff;
   color: #3a6cf6;
   border: none;
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 0;
   font-size: 1em;
-  box-shadow: 0 12px 38px #3a6cf641, 0 3px 12px #8f5ad511;
+  box-shadow: 0 6px 18px rgba(60,70,130,0.13);
   pointer-events: none;
   display: none;
   word-break: break-all;
@@ -215,7 +203,7 @@ main {
   transition: opacity 0.13s;
 }
 .nav-tooltip-content {
-  padding: 18px 18px;
+  padding: 16px 16px;
   text-align: center;
   font-size: 1.08em;
   color: #8f5ad5;
@@ -225,7 +213,6 @@ main {
   justify-content: center;
   min-height: 38px;
 }
-
 .nav-tooltip-arrow {
   position: absolute;
   left: 50%;
@@ -251,9 +238,9 @@ main {
 footer {
   text-align: center;
   font-size: 0.97em;
-  color: #e6eaf3;
+  color: #b2bcd3;
   margin: 58px 0 16px 0;
-  text-shadow: 0 2px 6px #222646;
+  text-shadow: 0 2px 6px #fff;
 }
 
 @media (max-width: 680px) {
