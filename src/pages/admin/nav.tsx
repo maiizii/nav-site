@@ -7,7 +7,7 @@ export default function NavManage() {
   const [message, setMessage] = useState('');
 
   const fetchLinks = () => {
-    fetch('/api/nav/list').then(res => res.json()).then(data => setLinks(data.data || []));
+    fetch('/nav/list').then(res => res.json()).then(data => setLinks(data.data || []));
   };
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function NavManage() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setMessage('');
-    const api = editingId ? '/api/nav/update' : '/api/nav/add';
+    const api = editingId ? '/nav/update' : '/nav/add';
     const payload = editingId ? { ...form, id: editingId } : form;
     const res = await fetch(api, {
       method: 'POST',
@@ -34,7 +34,7 @@ export default function NavManage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('确定要删除吗？')) return;
-    await fetch('/api/nav/delete', {
+    await fetch('/nav/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
