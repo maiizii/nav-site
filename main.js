@@ -148,8 +148,10 @@ function renderLinks(links) {
 
 // 分类、数据初始化
 async function loadAllLinks() {
-  const resp = await fetch('/api/nav-links');
-  allLinks = await resp.json();
+  // 改为请求排序正确的接口
+  const resp = await fetch('/api/nav-links/list');
+  const json = await resp.json();
+  allLinks = json.data || []; // 这里确保是数组
   allCategories = Array.from(new Set(allLinks.map(l => l.category).filter(Boolean)));
 }
 
