@@ -4,7 +4,7 @@ let currentTag = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// 配色与TKCall主题9一致的首字母色块
+// 主色系循环，与TKCall主题9风格一致
 const colors = ["#3a6cf6", "#ff9800", "#4caf50", "#8f5ad5", "#ff5b5b", "#00bcd4"];
 function getColorByTitle(title) {
   if (!title) return colors[0];
@@ -39,8 +39,6 @@ function showTooltip(text, card) {
     let top, left;
 
     const spaceBelow = window.innerHeight - cardRect.bottom;
-    // const spaceAbove = cardRect.top; // 没有用到，可删
-
     if (spaceBelow > tooltipRect.height + 18) {
       top = cardRect.bottom + 10 + scrollY;
       tooltip.classList.remove('nav-tooltip-up');
