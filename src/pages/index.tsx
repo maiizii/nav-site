@@ -11,7 +11,7 @@ type NavLink = {
 export default function Home() {
   const [links, setLinks] = useState<NavLink[]>([]);
   useEffect(() => {
-    fetch('/api/nav/list').then(res => res.json()).then(setLinks);
+    fetch('/api/nav/list').then(res => res.json()).then(data => setLinks(data.data));
   }, []);
   return (
     <main className="p-4 mx-auto max-w-3xl">
