@@ -1,7 +1,4 @@
-// ==========================
-// TKCall导航页 main.js 最新版
-// 页头菜单静态，侧栏分类和内容区动态
-// ==========================
+// 适配 style.css 结构的 main.js
 let allLinks = [];
 let allCategories = [];
 let currentCategory = '';
