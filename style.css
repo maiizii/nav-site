@@ -155,19 +155,16 @@ main {
   text-align: left;
   display: flex;
   align-items: center; /* 垂直居中 */
-  /* 省略号在前方显示，优先显示结尾内容 */
-  direction: rtl;
-  unicode-bidi: plaintext;
 }
-
-/* 浮层与箭头（绝对定位，内容padding不挤压文字） */
+ 
+/* 浮层与箭头 */
 .nav-tooltip {
   position: absolute;
   z-index: 9999;
   min-width: 220px;
   max-width: 360px;
   max-height: 320px;
-  overflow: auto;
+  overflow: visible; /* 让箭头能显示出来 */
   background: #fff;
   color: #222;
   border: none;
@@ -181,16 +178,18 @@ main {
   line-height: 1.6;
   transition: opacity 0.13s;
 }
-
 .nav-tooltip-content {
-  padding: 16px 18px;
+  padding: 18px 18px;
   text-align: center;
   font-size: 1.08em;
   color: #443;
   word-break: break-all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
 }
-
-/* 纯白三角箭头，无特效 */
+ 
 .nav-tooltip-arrow {
   position: absolute;
   left: 50%;
@@ -200,26 +199,21 @@ main {
   z-index: 2;
   pointer-events: none;
 }
-
 /* 下方浮层，箭头顶部与浮层顶部重合 */
 .nav-tooltip-down .nav-tooltip-arrow {
-  top: 0;
+  top: -14px;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
   border-bottom: 14px solid #fff;
 }
-
 /* 上方浮层，箭头底部与浮层底部重合 */
 .nav-tooltip-up .nav-tooltip-arrow {
-  bottom: 0;
+  bottom: -14px;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
   border-top: 14px solid #fff;
 }
-
-.nav-tooltip-down { padding-top: 14px; }
-.nav-tooltip-up   { padding-bottom: 14px; }
-
+ 
 footer {
   text-align: center;
   font-size: 0.97em;
