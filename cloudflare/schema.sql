@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS nav_links (
   url TEXT NOT NULL,
   category TEXT,
   description TEXT,
+  icon TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
