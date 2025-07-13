@@ -151,7 +151,7 @@ main {
   max-width: 140px;
 }
 
-/* 123.ss风格浮动卡片 */
+/* 浮动卡片及箭头修正 */
 .nav-tooltip {
   position: absolute;
   z-index: 9999;
@@ -189,16 +189,16 @@ main {
 .nav-tooltip-down .nav-tooltip-arrow {
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-top: 14px solid #fff;
-  margin-top: -7px;
+  border-bottom: 14px solid #fff; /* 朝上 */
+  margin-bottom: -7px;
   box-shadow: 0 6px 12px 0 rgba(240,133,100,0.15);
   filter: drop-shadow(0 3px 8px rgba(240,133,100,0.12));
 }
 .nav-tooltip-up .nav-tooltip-arrow {
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-bottom: 14px solid #fff;
-  margin-bottom: -7px;
+  border-top: 14px solid #fff; /* 朝下 */
+  margin-top: -7px;
   box-shadow: 0 -6px 12px 0 rgba(240,133,100,0.13);
   filter: drop-shadow(0 -3px 8px rgba(240,133,100,0.12));
 }
