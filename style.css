@@ -1,5 +1,5 @@
 body {
-  background: #f2f2f2 url('https://tkcall-upload-us.s3.dualstack.us-west-1.amazonaws.com/original/1X/bf14c792424aa926643bf39cc603e6d8128e62f9.png') repeat;
+  background: #f2f2f2 url('https://cdn.tkcall-upload-us.s3.dualstack.us-west-1.amazonaws.com/original/1X/bf14c792424aa926643bf39cc603e6d8128e62f9.png') repeat;
   color: #222;
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
   margin: 0;
@@ -83,8 +83,7 @@ body {
   font-weight: 400;
   position: relative;
 }
-.tk-menu-link:hover,
-.tk-menu-link.active {
+.tk-menu-link:hover {
   color: #1ca57d;
   background: none;
 }
@@ -148,7 +147,8 @@ body {
   min-height: 70vh;
   padding: 0 32px;
   box-sizing: border-box;
-  gap: 28px;   /* 左右间距缩小 */
+  gap: 28px;
+  align-items: flex-start; /* 左右上对齐 */
 }
 
 .sidebar {
@@ -158,18 +158,14 @@ body {
   background: #fff;
   box-shadow: 0 8px 28px 0 rgba(60,62,68,0.15), 0 1.5px 14px rgba(60,62,68,0.10);
   padding: 22px 0 18px 0;
-  position: sticky;
-  top: 72px;
-  /* min-height: 220px; 移除，动态高度 */
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0;
-  /* justify-content: center; 移除，顶部对齐 */
-  height: auto;
   box-sizing: border-box;
   justify-content: flex-start;
   position: relative;
+  /* 高度自适应 */
 }
 
 .sidebar-categories-label {
@@ -186,12 +182,12 @@ body {
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;  /* 分类项间距缩小 */
+  gap: 14px;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
   padding: 0;
-  margin-bottom: 39px;
+  margin-bottom: 28px;
 }
 .category-item {
   background: #f2f2f2;
@@ -220,31 +216,30 @@ body {
   border-left: 4px solid #88af8e;
 }
 
-/* TOP按钮 */
+/* TOP按钮：扁平、圆角、绿色边框、hover绿色填充 */
 .sidebar-top-btn {
-  margin-top: auto;
+  width: 64px;
+  height: 32px;
+  margin-top: 10px;
   margin-bottom: 8px;
   margin-left: 0;
-  width: 38px;
-  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  border-radius: 50%;
-  background: #1ca57d;
-  color: #fff;
-  box-shadow: 0 2px 8px 0 rgba(60,62,68,0.10);
-  font-size: 13px;
+  border: 2px solid #1ca57d;
+  border-radius: 16px;
+  background: #fff;
+  color: #1ca57d;
+  font-size: 14px;
   font-weight: bold;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: background 0.17s, box-shadow 0.15s;
-  position: static;
+  transition: background 0.17s, color 0.17s;
+  box-shadow: none;
 }
 .sidebar-top-btn:hover {
-  background: #08805b;
-  box-shadow: 0 4px 18px 0 rgba(60,62,68,0.12);
+  background: #1ca57d;
+  color: #fff;
 }
 
 .main-content {
@@ -295,7 +290,7 @@ body {
   box-shadow: 0 0 8px 2px rgba(136,175,142,0.07), 0 1.5px 8px rgba(60,62,68,0.03);
   display: flex;
   align-items: center;
-  transition: box-shadow 0.18s, transform 0.13s, background 0.13s;
+  transition: box-shadow 0.18s, transform 0.13s, background 0.13s, border 0.13s;
   position: relative;
   padding: 16px 12px 16px 12px;
   border: 1px solid #edf3ee;
@@ -308,7 +303,7 @@ body {
   box-shadow: 0 6px 24px 0 rgba(60,62,68,0.14), 0 0 16px 4px #d4efd8;
   background: #f5f5f5;
   transform: translateY(-2px) scale(1.035);
-  border: 1px solid #88af8e;
+  border: none;
   z-index: 2;
 }
 .nav-icon {
@@ -500,10 +495,11 @@ footer {
     border-left: none;
   }
   .sidebar-top-btn {
-    width: 32px;
-    height: 32px;
+    width: 54px;
+    height: 28px;
     font-size: 11px;
     margin-bottom: 2px;
+    border-radius: 13px;
   }
   .main-content {
     min-height: 400px;
