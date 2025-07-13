@@ -1,6 +1,6 @@
-import { verifyAdmin, getAdminIdFromRequest } from '../utils/auth';
+import { verifyAdmin, getAdminIdFromRequest } from '../../utils/auth';
 
-export async function onRequest(context) {
+export async function onRequest(context: any) {
   const { request, env } = context;
   if (!(await verifyAdmin(request, env))) {
     return new Response(JSON.stringify({ success: false, message: '未登录' }), { status: 401 });
