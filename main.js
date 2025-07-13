@@ -1,10 +1,12 @@
+// 适配 style.css 结构，分类侧栏/内容区都按 sort 排序，浮动卡片浅底深色文字，TOP/设置按钮功能
+
 let allLinks = [];
 let allCategories = [];
 let currentCategory = '';
 let currentSearch = '';
 let tooltipTimer = null;
 
-// 读取分类
+// 侧栏分类菜单：从接口读取
 async function loadCategories() {
   const resp = await fetch('/api/nav-categories/list');
   const json = await resp.json();
@@ -12,7 +14,7 @@ async function loadCategories() {
   renderCategoryList();
 }
 
-// 侧栏分类渲染，按 sort 排序
+// 侧栏分类渲染，按 sort 字段升序排序
 function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
@@ -27,7 +29,7 @@ function renderCategoryList() {
   };
   catBox.appendChild(allBtn);
 
-  // 分类排序
+  // 按 sort 字段升序排序
   const sortedCats = [...allCategories].sort((a, b) => {
     const sa = typeof a.sort === 'number' ? a.sort : 9999;
     const sb = typeof b.sort === 'number' ? b.sort : 9999;
@@ -47,7 +49,7 @@ function renderCategoryList() {
   });
 }
 
-// 读取导航项
+// 导航项列表读取
 async function loadLinks() {
   const resp = await fetch('/api/nav-links/list');
   const json = await resp.json();
@@ -179,14 +181,29 @@ document.getElementById('search').oninput = e => {
   renderLinks(allLinks);
 };
 
-// 初始化
+// 初始化与TOP/设置按钮事件
+document.addEventListener('DOMContentLoaded', () => {
+  initPage();
+
+  // TOP按钮滚动到顶部
+  const topBtn = document.getElementById('sidebar-top-btn');
+  if (topBtn) {
+    topBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // 设置按钮弹窗或自定义功能
+  const settingsBtn = document.getElementById('settings-btn');
+  if (settingsBtn) {
+    settingsBtn.onclick = () => alert('这里可以打开设置弹窗');
+  }
+});
+
 async function initPage() {
   await loadCategories();
   await loadLinks();
 }
-document.addEventListener('DOMContentLoaded', initPage);
 
-// 浮动注释卡片
+// 浮动注释卡片（浅底深色文字）
 function createTooltip() {
   let tooltip = document.getElementById('nav-tooltip');
   if (!tooltip) {
