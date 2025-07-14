@@ -12,6 +12,7 @@ const CAT_DEL_API = "/api/nav-categories/delete";
 const CAT_SORT_API = "/api/nav-categories/sort";
 
 let allCategories = [];
+let currentNavCategoryFilter = "";
 
 // ===================== 工具函数 =====================
 // 获取token统一方法
@@ -32,6 +33,14 @@ async function fetchCategories() {
   const json = await res.json();
   allCategories = json.data || [];
   allCategories.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+
+  // 填充筛选下拉框
+  const catFilter = document.getElementById('nav-category-filter');
+  if (catFilter) {
+    catFilter.innerHTML = `<option value="">全部</option>` +
+      allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    catFilter.value = currentNavCategoryFilter;
+  }
 }
 
 async function loadCategories() {
@@ -152,8 +161,27 @@ async function loadNavLinks() {
   }
   const json = await res.json();
   let links = json.data || [];
+  if (currentNavCategoryFilter) {
+    links = links.filter(link => link.category === currentNavCategoryFilter);
+  }
   renderNavTable(links);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const catFilter = document.getElementById('nav-category-filter');
+  if (catFilter) {
+    catFilter.onchange = () => {
+      currentNavCategoryFilter = catFilter.value;
+      loadNavLinks();
+    };
+  }
+});
+
+// 初始化加载分类和导航数据
+document.addEventListener('DOMContentLoaded', async () => {
+  await fetchCategories();
+  await loadNavLinks();
+});
 
 function renderNavTable(list) {
   const navList = document.getElementById('nav-list');
@@ -216,7 +244,7 @@ function renderNavTable(list) {
     tbody.appendChild(tr);
   });
 
-  // 拖拽排序
+  // 拖拽排序只针对当前分类
   Sortable.create(tbody, {
     animation: 150,
     handle: '.drag-handle',
@@ -267,6 +295,12 @@ function renderNavTable(list) {
     };
   });
 
+  // 新增导航时，默认分类为当前筛选分类（如果有）
+  const addCatSelect = document.getElementById('add-category');
+  if (currentNavCategoryFilter && addCatSelect) {
+    addCatSelect.value = currentNavCategoryFilter;
+  }
+
   document.getElementById('add-btn').onclick = async () => {
     const payload = {
       title: document.getElementById('add-title').value,
@@ -289,50 +323,6 @@ function renderNavTable(list) {
   };
 }
 
-// ===================== 登录/密码修改 =====================
-// 密码修改事件
-const changePwdBtn = document.getElementById('change-password-btn');
-if (changePwdBtn) {
-  changePwdBtn.onclick = async () => {
-    const oldPassword = document.getElementById('old-password').value;
-    const newPassword = document.getElementById('new-password').value;
-    const resp = await fetch('/api/admin-change-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAdminToken() },
-      body: JSON.stringify({ oldPassword, newPassword, })
-    });
-    const json = await resp.json();
-    if (json.msg === '密码修改成功') {
-      alert('密码修改成功，请重新登录');
-      localStorage.removeItem('adminToken');
-      setTimeout(() => { location.reload(); }, 1200);
-    } else {
-      alert(json.msg || '修改失败');
-    }
-  };
-}
-
-// 登录事件
-const loginBtn = document.getElementById('login-btn');
-if (loginBtn) {
-  loginBtn.onclick = async () => {
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
-    const resp = await fetch('/api/admin-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const json = await resp.json();
-    if (json.token) {
-      localStorage.setItem('adminToken', json.token);
-      setTimeout(() => { location.reload(); }, 1200);
-    } else {
-      alert(json.msg || '登录失败');
-    }
-  };
-}
-
 // ===================== Tab切换 =====================
 document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn => {
   btn.onclick = async function () {
@@ -349,11 +339,4 @@ document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn =
     }
     if (tab === 'cat') loadCategories();
   };
-});
-
-// ===================== 初始化 =====================
-document.addEventListener('DOMContentLoaded', async () => {
-  // 先加载分类，再加载导航
-  await fetchCategories();
-  await loadNavLinks();
-});
+}
