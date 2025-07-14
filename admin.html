@@ -28,6 +28,7 @@
         <img class="logo-img" src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" />
         <span class="logo-title">TKCall后台管理</span>
         <button id="adminLogoutBtn" class="admin-logout-btn" style="display:none;">退出登录</button>
+        <button id="adminChangePwdShowBtn" class="admin-logout-btn" style="display:none;">修改密码</button>
       </div>
       <nav class="admin-menu">
         <a class="admin-menu-link active" href="#" data-tab="nav">导航管理</a>
@@ -68,6 +69,18 @@
     </div>
   </div>
 
+  <!-- 修改密码弹窗 -->
+  <div id="adminChangePwdModal" class="admin-login-modal" style="display:none;">
+    <div class="admin-login-box">
+      <h2>修改密码</h2>
+      <div class="admin-login-msg" id="adminChangePwdMsg"></div>
+      <input id="changeOldPwd" type="password" placeholder="原密码" autocomplete="current-password" />
+      <input id="changeNewPwd" type="password" placeholder="新密码" autocomplete="new-password" />
+      <button id="adminChangePwdBtn">确认修改</button>
+      <button id="adminChangePwdCancelBtn" style="background:#eee;color:#666;margin-top:10px;">取消</button>
+    </div>
+  </div>
+
   <script src="./admin.js"></script>
   <script>
     // 登录流程
@@ -75,15 +88,16 @@
       document.getElementById('adminLoginModal').style.display = 'flex';
       document.getElementById('adminLoginMsg').textContent = msg || '';
       document.getElementById('adminLogoutBtn').style.display = 'none';
+      document.getElementById('adminChangePwdShowBtn').style.display = 'none';
     }
     function hideLoginModal() {
       document.getElementById('adminLoginModal').style.display = 'none';
       document.getElementById('adminLogoutBtn').style.display = '';
+      document.getElementById('adminChangePwdShowBtn').style.display = '';
     }
     async function verifyToken() {
       const token = localStorage.getItem('adminToken');
       if (!token) return false;
-      // 用一个后台API验证token有效性
       try {
         const resp = await fetch('/api/admin-verify-token', {
           method: 'POST',
@@ -137,11 +151,60 @@
     // 页面加载时强制登录验证
     (async function () {
       if (!await ensureLogin()) return;
-      // 显示退出登录按钮
+      // 显示退出登录和修改密码按钮
       document.getElementById('adminLogoutBtn').style.display = '';
+      document.getElementById('adminChangePwdShowBtn').style.display = '';
       // 后续 admin.js 里的所有 fetch 带上 token
       window.adminToken = localStorage.getItem('adminToken');
     })();
+
+    // 显示修改密码弹窗
+    document.getElementById('adminChangePwdShowBtn').onclick = function () {
+      document.getElementById('adminChangePwdModal').style.display = 'flex';
+      document.getElementById('adminChangePwdMsg').textContent = '';
+      document.getElementById('changeOldPwd').value = '';
+      document.getElementById('changeNewPwd').value = '';
+    };
+
+    // 取消修改密码
+    document.getElementById('adminChangePwdCancelBtn').onclick = function () {
+      document.getElementById('adminChangePwdModal').style.display = 'none';
+    };
+
+    // 修改密码提交
+    document.getElementById('adminChangePwdBtn').onclick = async function () {
+      const oldPwd = document.getElementById('changeOldPwd').value;
+      const newPwd = document.getElementById('changeNewPwd').value;
+      const msgEl = document.getElementById('adminChangePwdMsg');
+      msgEl.textContent = '';
+      if (!oldPwd || !newPwd) {
+        msgEl.textContent = '请输入原密码和新密码';
+        return;
+      }
+      if (newPwd.length < 6) {
+        msgEl.textContent = '新密码长度不能少于6位';
+        return;
+      }
+      const token = localStorage.getItem('adminToken');
+      const resp = await fetch('/api/admin-change-password', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ oldPassword: oldPwd, newPassword: newPwd })
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        msgEl.textContent = '密码修改成功，请重新登录！';
+        setTimeout(() => {
+          localStorage.removeItem('adminToken');
+          location.reload();
+        }, 1200);
+      } else {
+        msgEl.textContent = data.msg || '密码修改失败';
+      }
+    };
   </script>
 </body>
 </html>
