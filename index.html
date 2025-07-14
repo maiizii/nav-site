@@ -4,13 +4,18 @@
   <meta charset="UTF-8" />
   <title>TK客网站导航</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- 增加 favicon，调用 tc.png -->
+  <link rel="icon" href="/tc.png" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <header class="tk-header">
     <div class="tk-header-inner">
       <div class="tk-logo">
-        <img class="logo-img" src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" />
+        <!-- logo改为tkcall_logo.png，且加本页跳转链接 -->
+        <a href="https://www.tkcall.com" style="text-decoration:none;">
+          <img class="logo-img" src="/tkcall_logo.png" alt="logo" />
+        </a>
         <span class="site-nav-title">网站导航</span>
       </div>
       <nav class="tk-menu">
@@ -25,7 +30,8 @@
         <div class="search-bar">
           <input id="search" type="text" placeholder="搜索..." />
         </div>
-        <button class="header-btn" id="settings-btn">设置</button>
+        <!-- 设置按钮推到最右，并链接admin本页打开 -->
+        <a href="admin" class="header-btn" id="settings-btn" style="margin-left:auto;">设置</a>
       </div>
     </div>
   </header>
