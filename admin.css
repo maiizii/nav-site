@@ -20,8 +20,6 @@ body {
   font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
   margin: 0;
 }
-
-/* 毛玻璃页头 */
 .admin-header.glass-header {
   background: var(--color-glass);
   -webkit-backdrop-filter: blur(16px);
