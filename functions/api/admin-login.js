@@ -1,6 +1,12 @@
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
+    // 强化：输出JWT_SECRET到日志
+    console.log('[admin-login] env.JWT_SECRET =', env.JWT_SECRET);
+    if (!env.JWT_SECRET) {
+      return new Response(JSON.stringify({ msg: '服务器端JWT_SECRET未配置' }), { status: 500 });
+    }
+
     const body = await request.json();
     const { username, password } = body;
 
@@ -34,14 +40,14 @@ export async function onRequestPost(context) {
     }
 
     const header = base64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-    const payload = base64url(JSON.stringify({ adminId: admin.id, username, exp: Math.floor(Date.now()/1000) + 7200 }));
+    const payload = base64url(JSON.stringify({ adminId: admin.id, username, exp: Math.floor(Date.now() / 1000) + 7200 }));
     const signature = await signJWT(header, payload, env.JWT_SECRET);
     const token = [header, payload, signature].join('.');
 
     return new Response(JSON.stringify({ token }), { status: 200 });
   } catch (err) {
     // 错误输出到日志
-    console.log("后台报错:", err);
+    console.log("[admin-login] 后台报错:", err);
     return new Response(
       JSON.stringify({ msg: "服务器异常", detail: err.message }),
       { status: 500 }
