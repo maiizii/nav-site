@@ -1,5 +1,10 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
+  // 强化：输出JWT_SECRET到日志
+  console.log('[admin-verify-token] env.JWT_SECRET =', env.JWT_SECRET);
+  if (!env.JWT_SECRET) {
+    return new Response(JSON.stringify({ msg: '服务器端JWT_SECRET未配置' }), { status: 500 });
+  }
   const token = request.headers.get('Authorization')?.replace('Bearer ', '');
   if (!token) return new Response(JSON.stringify({ msg: '未登录' }), { status: 401 });
 
@@ -32,6 +37,6 @@ async function verifyJWT(token, secret) {
   );
   if (!valid) return null;
   const payload = JSON.parse(atob(payloadB64));
-  if (payload.exp && payload.exp < Math.floor(Date.now()/1000)) return null;
+  if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
   return payload;
 }
