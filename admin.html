@@ -2,7 +2,7 @@
 <html lang="zh-cn">
 <head>
   <meta charset="UTF-8" />
-  <title>TK客网站导航管理</title>
+  <title>TKCall后台管理</title>
   <link rel="stylesheet" href="./admin.css" />
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
@@ -11,13 +11,14 @@
     <div class="admin-header-inner">
       <div class="admin-logo">
         <img class="logo-img" src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" />
-        <span class="logo-title">TK客网站导航管理</span>
-        <button id="adminLogoutBtn" class="admin-logout-btn" style="display:none;">退出登录</button>
-        <button id="adminChangePwdShowBtn" class="admin-logout-btn" style="display:none;">修改密码</button>
+        <span class="logo-title">TKCall后台管理</span>
       </div>
       <nav class="admin-menu">
         <a class="admin-menu-link active" href="#" data-tab="cat">分类管理</a>
         <a class="admin-menu-link" href="#" data-tab="nav">导航管理</a>
+        <a class="admin-index-link" href="index" target="_blank">首页</a>
+        <button id="adminChangePwdShowBtn" class="admin-logout-btn" style="display:none;">修改密码</button>
+        <button id="adminLogoutBtn" class="admin-logout-btn" style="display:none;">退出登录</button>
       </nav>
     </div>
   </header>
@@ -35,9 +36,9 @@
       </section>
       <section id="tab-nav" class="admin-tab">
         <h2>导航管理</h2>
-        <div style="margin-bottom:12px;">
+        <div style="margin-bottom:18px;">
           <label for="nav-category-filter" class="admin-label">分类筛选：</label>
-          <select id="nav-category-filter" class="admin-select" style="min-width:120px;">
+          <select id="nav-category-filter" class="admin-select">
             <option value="">全部</option>
           </select>
         </div>
@@ -46,7 +47,7 @@
     </main>
   </div>
   <footer>
-    <p>© 2025 TKCall TK客网站导航后台管理</p>
+    <p>© 2025 TKCall后台管理</p>
   </footer>
 
   <!-- 登录弹窗 -->
