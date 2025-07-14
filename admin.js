@@ -29,7 +29,6 @@ async function fetchCategories() {
   const res = await fetchWithAuth(CAT_API);
   const json = await res.json();
   const cats = json.data || [];
-  // 按sort字段升序排序
   cats.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   allCategories = cats;
 }
@@ -63,7 +62,6 @@ async function loadNavLinks() {
   let links = json.data || [];
   // 按分类排序（先分类sort，再导航sort）
   if (Array.isArray(allCategories) && allCategories.length) {
-    // 构造分类顺序映射
     const catOrder = {};
     allCategories.forEach((cat, idx) => { catOrder[cat.name] = idx; });
     links.sort((a, b) => {
