@@ -51,6 +51,12 @@
       </section>
       <section id="tab-nav" class="admin-tab">
         <h2>导航管理</h2>
+        <div style="margin-bottom:12px;">
+          <label for="nav-category-filter">分类筛选：</label>
+          <select id="nav-category-filter" style="min-width:120px;">
+            <option value="">全部</option>
+          </select>
+        </div>
         <div id="nav-list"></div>
       </section>
     </main>
@@ -216,6 +222,5 @@
       }
     };
   </script>
-  <!-- 这里不要再有 window.renderNavTable 的覆盖脚本！ -->
 </body>
 </html>
