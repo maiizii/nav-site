@@ -12,20 +12,136 @@ const CAT_DEL_API = "/api/nav-categories/delete";
 const CAT_SORT_API = "/api/nav-categories/sort";
 
 let allCategories = [];
-let currentNavCategoryFilter = ""; // 新增：当前导航筛选分类
+let currentNavCategoryFilter = "";
 
 // ===================== 工具函数 =====================
-// 获取token统一方法
 function getAdminToken() {
   return localStorage.getItem('adminToken');
 }
-
-// fetch带token
 async function fetchWithAuth(url, options = {}) {
   options.headers = options.headers || {};
   options.headers['Authorization'] = 'Bearer ' + getAdminToken();
   return fetch(url, options);
 }
+
+// ===================== 登录/密码修改 =====================
+async function showLoginModal(msg) {
+  document.getElementById('adminLoginModal').style.display = 'flex';
+  document.getElementById('adminLoginMsg').textContent = msg || '';
+  document.getElementById('adminLogoutBtn').style.display = 'none';
+  document.getElementById('adminChangePwdShowBtn').style.display = 'none';
+}
+function hideLoginModal() {
+  document.getElementById('adminLoginModal').style.display = 'none';
+  document.getElementById('adminLogoutBtn').style.display = '';
+  document.getElementById('adminChangePwdShowBtn').style.display = '';
+}
+async function verifyToken() {
+  const token = localStorage.getItem('adminToken');
+  if (!token) return false;
+  try {
+    const resp = await fetch('/api/admin-verify-token', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (resp.status === 401) return false;
+    return true;
+  } catch (e) { return false; }
+}
+async function ensureLogin() {
+  document.getElementById('adminLoginModal').style.display = 'none';
+  await new Promise(r => setTimeout(r, 200));
+  if (!await verifyToken()) {
+    await new Promise(r => setTimeout(r, 400));
+    if (!await verifyToken()) {
+      showLoginModal();
+      return false;
+    }
+  }
+  hideLoginModal();
+  return true;
+}
+document.getElementById('adminLoginBtn').onclick = async function () {
+  const username = document.getElementById('adminLoginUser').value.trim();
+  const password = document.getElementById('adminLoginPwd').value;
+  const msgEl = document.getElementById('adminLoginMsg');
+  msgEl.textContent = '';
+  if (!username || !password) {
+    msgEl.textContent = '请输入用户名和密码';
+    return;
+  }
+  const resp = await fetch('/api/admin-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  });
+  const data = await resp.json();
+  if (resp.ok && data.token) {
+    localStorage.setItem('adminToken', data.token);
+    hideLoginModal();
+    setTimeout(() => { location.reload(); }, 600);
+  } else {
+    msgEl.textContent = data.msg || '登录失败';
+  }
+};
+document.getElementById('adminLogoutBtn').onclick = function () {
+  localStorage.removeItem('adminToken');
+  location.reload();
+};
+(async function () {
+  if (!await ensureLogin()) return;
+  document.getElementById('adminLogoutBtn').style.display = '';
+  document.getElementById('adminChangePwdShowBtn').style.display = '';
+  window.adminToken = localStorage.getItem('adminToken');
+})();
+document.getElementById('adminChangePwdShowBtn').onclick = function () {
+  document.getElementById('adminChangePwdModal').style.display = 'flex';
+  document.getElementById('adminChangePwdMsg').textContent = '';
+  document.getElementById('changeOldPwd').value = '';
+  document.getElementById('changeNewPwd').value = '';
+  document.getElementById('changeNewPwd2').value = '';
+};
+document.getElementById('adminChangePwdCancelBtn').onclick = function () {
+  document.getElementById('adminChangePwdModal').style.display = 'none';
+};
+document.getElementById('adminChangePwdBtn').onclick = async function () {
+  const oldPwd = document.getElementById('changeOldPwd').value;
+  const newPwd = document.getElementById('changeNewPwd').value;
+  const newPwd2 = document.getElementById('changeNewPwd2').value;
+  const msgEl = document.getElementById('adminChangePwdMsg');
+  msgEl.textContent = '';
+  if (!oldPwd || !newPwd || !newPwd2) {
+    msgEl.textContent = '请输入原密码和新密码';
+    return;
+  }
+  if (newPwd.length < 6) {
+    msgEl.textContent = '新密码长度不能少于6位';
+    return;
+  }
+  if (newPwd !== newPwd2) {
+    msgEl.textContent = '两次输入的新密码不一致';
+    return;
+  }
+  const token = localStorage.getItem('adminToken');
+  const resp = await fetch('/api/admin-change-password', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ oldPassword: oldPwd, newPassword: newPwd })
+  });
+  const data = await resp.json();
+  if (resp.ok) {
+    msgEl.textContent = '密码修改成功，请重新登录！';
+    setTimeout(() => {
+      localStorage.removeItem('adminToken');
+      window.location.reload();
+    }, 1200);
+  } else {
+    msgEl.textContent = data.msg || '密码修改失败';
+  }
+};
 
 // ===================== 分类管理 =====================
 async function fetchCategories() {
@@ -33,8 +149,6 @@ async function fetchCategories() {
   const json = await res.json();
   allCategories = json.data || [];
   allCategories.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-
-  // 填充导航筛选下拉框
   const catFilter = document.getElementById('nav-category-filter');
   if (catFilter) {
     catFilter.innerHTML = `<option value="">全部</option>` +
@@ -42,7 +156,6 @@ async function fetchCategories() {
     catFilter.value = currentNavCategoryFilter;
   }
 }
-
 async function loadCategories() {
   const res = await fetchWithAuth(CAT_API);
   const json = await res.json();
@@ -50,7 +163,6 @@ async function loadCategories() {
   cats.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   renderCategoryTable(cats);
 }
-
 function renderCategoryTable(list) {
   const catList = document.getElementById('cat-list');
   catList.innerHTML = `
@@ -91,8 +203,6 @@ function renderCategoryTable(list) {
     `;
     tbody.appendChild(tr);
   });
-
-  // 拖拽排序
   Sortable.create(tbody, {
     animation: 150,
     handle: '.drag-handle',
@@ -109,7 +219,6 @@ function renderCategoryTable(list) {
       }).then(() => loadCategories());
     }
   });
-
   tbody.querySelectorAll('.save-cat-btn').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
@@ -125,7 +234,6 @@ function renderCategoryTable(list) {
       loadCategories();
     };
   });
-
   tbody.querySelectorAll('.del-cat-btn').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
@@ -138,7 +246,6 @@ function renderCategoryTable(list) {
       loadCategories();
     };
   });
-
   document.getElementById('add-cat-btn').onclick = async () => {
     const name = document.getElementById('add-cat-name').value;
     if (!name.trim()) return;
@@ -166,8 +273,6 @@ async function loadNavLinks() {
   }
   renderNavTable(links);
 }
-
-// 筛选框监听（只需一次注册）
 document.addEventListener('DOMContentLoaded', () => {
   const catFilter = document.getElementById('nav-category-filter');
   if (catFilter) {
@@ -177,13 +282,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 });
-
-// 初始化：先加载分类，再加载导航
 document.addEventListener('DOMContentLoaded', async () => {
   await fetchCategories();
   await loadNavLinks();
 });
-
 function renderNavTable(list) {
   const navList = document.getElementById('nav-list');
   navList.innerHTML = `
@@ -244,8 +346,6 @@ function renderNavTable(list) {
     `;
     tbody.appendChild(tr);
   });
-
-  // 拖拽排序（只针对当前筛选数据）
   Sortable.create(tbody, {
     animation: 150,
     handle: '.drag-handle',
@@ -262,7 +362,6 @@ function renderNavTable(list) {
       }).then(() => loadNavLinks());
     }
   });
-
   tbody.querySelectorAll('.save-btn').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
@@ -282,7 +381,6 @@ function renderNavTable(list) {
       loadNavLinks();
     };
   });
-
   tbody.querySelectorAll('.del-btn').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
@@ -295,13 +393,10 @@ function renderNavTable(list) {
       loadNavLinks();
     };
   });
-
-  // 新增导航时，默认分类为当前筛选分类（如果有）
   const addCatSelect = document.getElementById('add-category');
   if (currentNavCategoryFilter && addCatSelect) {
     addCatSelect.value = currentNavCategoryFilter;
   }
-
   document.getElementById('add-btn').onclick = async () => {
     const payload = {
       title: document.getElementById('add-title').value,
@@ -344,10 +439,6 @@ document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn =
 
 // ===================== 初始化 =====================
 document.addEventListener('DOMContentLoaded', async () => {
-  // 先加载分类，再加载导航
   await fetchCategories();
   await loadNavLinks();
 });
-
-// ===================== 登录/密码修改 =====================
-// 你的原有登录/密码相关代码可保持不变
