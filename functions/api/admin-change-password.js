@@ -1,36 +1,34 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const sqlite3 = require('sqlite3').verbose();
-const SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-
-module.exports = function (req, res) {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ msg: '未登录' });
-
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+  if (!token) {
+    return new Response(JSON.stringify({ msg: '未登录' }), { status: 401 });
+  }
+  // JWT 验证
+  const jwt = require('@tsndr/cloudflare-worker-jwt');
+  const SECRET = env.JWT_SECRET || 'your_jwt_secret';
   let payload;
   try {
-    payload = jwt.verify(token, SECRET);
+    payload = await jwt.verify(token, SECRET);
+    if (!payload) throw new Error();
   } catch (e) {
-    return res.status(401).json({ msg: '登录已过期，请重新登录' });
+    return new Response(JSON.stringify({ msg: '登录已过期，请重新登录' }), { status: 401 });
   }
-
-  const db = new sqlite3.Database('./functions/db/db.sqlite');
-  const { oldPassword, newPassword } = req.body;
-  db.get('SELECT * FROM admin WHERE id = ?', [payload.adminId], async (err, admin) => {
-    if (err || !admin) {
-      db.close();
-      return res.status(401).json({ msg: '未找到用户' });
-    }
-    const match = await bcrypt.compare(oldPassword, admin.password_hash);
-    if (!match) {
-      db.close();
-      return res.status(400).json({ msg: '原密码错误' });
-    }
-    const newHash = await bcrypt.hash(newPassword, 10);
-    db.run('UPDATE admin SET password_hash = ? WHERE id = ?', [newHash, payload.adminId], function (err) {
-      db.close();
-      if (err) return res.status(500).json({ msg: '修改失败' });
-      res.json({ msg: '密码修改成功' });
-    });
-  });
-};
+  const { oldPassword, newPassword } = await request.json();
+  // 查询管理员
+  const stmt = env.DB.prepare("SELECT * FROM admin WHERE id = ?");
+  const admin = await stmt.bind(payload.adminId).first();
+  if (!admin) {
+    return new Response(JSON.stringify({ msg: "未找到用户" }), { status: 401 });
+  }
+  // 校验原密码
+  const bcrypt = require('bcryptjs');
+  const match = await bcrypt.compare(oldPassword, admin.password_hash);
+  if (!match) {
+    return new Response(JSON.stringify({ msg: "原密码错误" }), { status: 400 });
+  }
+  // 更新新密码
+  const newHash = await bcrypt.hash(newPassword, 10);
+  await env.DB.prepare("UPDATE admin SET password_hash = ? WHERE id = ?").bind(newHash, admin.id).run();
+  return new Response(JSON.stringify({ msg: "密码修改成功" }), { status: 200 });
+}
