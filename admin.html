@@ -216,23 +216,6 @@
       }
     };
   </script>
-  <script>
-    // 导航管理按分类排序功能（admin.js 里需实现/覆盖）
-    // 加载 allCategories 后，排序导航列表
-    window.renderNavTable = function(list) {
-      // 分类排序
-      const sortedCategories = window.allCategories ? window.allCategories.map(c => c.name) : [];
-      list.sort((a, b) => {
-        const ca = sortedCategories.indexOf(a.category);
-        const cb = sortedCategories.indexOf(b.category);
-        if (ca !== cb) return ca - cb;
-        return (a.sort || 0) - (b.sort || 0);
-      });
-      // ...后续表格渲染逻辑不变
-      // 这里你可以直接调用原本的渲染表格代码
-      // 例如: window.__originalRenderNavTable(list);
-      // 或直接写完整渲染代码
-    };
-  </script>
+  <!-- 这里不要再有 window.renderNavTable 的覆盖脚本！ -->
 </body>
 </html>
