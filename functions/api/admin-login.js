@@ -7,6 +7,7 @@ export async function onRequestPost(context) {
     // 查询数据库
     const stmt = env.DB.prepare("SELECT * FROM admin WHERE username = ?");
     const admin = await stmt.bind(username).first();
+
     if (!admin) {
       return new Response(JSON.stringify({ msg: "用户名或密码错误" }), { status: 401 });
     }
@@ -16,11 +17,17 @@ export async function onRequestPost(context) {
     const data = enc.encode(password);
     const hashBuf = await crypto.subtle.digest("SHA-256", data);
     const hashHex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // 日志输出，方便调试
+    console.log("输入密码:", password);
+    console.log("计算hash:", hashHex);
+    console.log("数据库hash:", admin.password_hash);
+
     if (hashHex !== admin.password_hash) {
       return new Response(JSON.stringify({ msg: "用户名或密码错误" }), { status: 401 });
     }
 
-    // JWT payload不要直接用btoa(JSON.stringify(...))，需用安全base64
+    // JWT base64url编码
     function base64url(str) {
       return btoa(unescape(encodeURIComponent(str)))
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -32,8 +39,9 @@ export async function onRequestPost(context) {
     const token = [header, payload, signature].join('.');
 
     return new Response(JSON.stringify({ token }), { status: 200 });
-
   } catch (err) {
+    // 错误输出到日志
+    console.log("后台报错:", err);
     return new Response(
       JSON.stringify({ msg: "服务器异常", detail: err.message }),
       { status: 500 }
