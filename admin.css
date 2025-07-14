@@ -51,22 +51,44 @@ body {
   height: 36px;
   width: auto;
   object-fit: contain;
-  margin-right: 8px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
-.site-nav-title {
+.tk-badge {
   display: inline-block;
-  font-size: 1.5em;
-  font-family: 'PingFang SC','Microsoft Yahei',Arial,sans-serif;
-  color: var(--color-main);
-  background: var(--color-sub);
-  border-radius: 6px;
-  padding: 0 16px;
-  height: 38px;
-  line-height: 38px;
-  margin-left: 8px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  box-shadow: 0 1px 4px #e0e3e7;
+  background: #222;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0 7px;
+  font-size: 13px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  font-weight: 500;
+  height: 22px;
+  line-height: 22px;
+  margin-left: -5px;
+  margin-right: 6px;
+  vertical-align: middle;
+  position: relative;
+  top: -5px;
+  box-shadow: 0 1px 4px #dedede;
+}
+.site-nav-btn {
+  display: inline-block;
+  background: #fff;
+  border: 1.5px solid #dadada;
+  color: #333;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  padding: 2px 18px 2px 18px;
+  margin-right: 8px;
+  margin-left: 0;
+  height: 32px;
+  line-height: 28px;
+  font-weight: 500;
+  vertical-align: middle;
+  box-shadow: 0 1px 4px #efefef;
+  transition: border 0.16s, color 0.16s, background 0.16s;
 }
 .admin-menu {
   display: flex;
