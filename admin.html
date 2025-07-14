@@ -85,10 +85,9 @@
       if (!token) return false;
       // 用一个后台API验证token有效性
       try {
-        const resp = await fetch('/api/admin-change-password', {
+        const resp = await fetch('/api/admin-verify-token', {
           method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ oldPassword: '___dummy___', newPassword: '___dummy___' })
+          headers: { 'Authorization': 'Bearer ' + token }
         });
         if (resp.status === 401) return false;
         return true;
