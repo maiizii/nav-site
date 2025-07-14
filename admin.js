@@ -12,7 +12,7 @@ const CAT_DEL_API = "/api/nav-categories/delete";
 const CAT_SORT_API = "/api/nav-categories/sort";
 
 let allCategories = [];
-let currentNavCategoryFilter = "";
+let currentNavCategoryFilter = ""; // 新增：当前导航筛选分类
 
 // ===================== 工具函数 =====================
 // 获取token统一方法
@@ -34,7 +34,7 @@ async function fetchCategories() {
   allCategories = json.data || [];
   allCategories.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
-  // 填充筛选下拉框
+  // 填充导航筛选下拉框
   const catFilter = document.getElementById('nav-category-filter');
   if (catFilter) {
     catFilter.innerHTML = `<option value="">全部</option>` +
@@ -167,6 +167,7 @@ async function loadNavLinks() {
   renderNavTable(links);
 }
 
+// 筛选框监听（只需一次注册）
 document.addEventListener('DOMContentLoaded', () => {
   const catFilter = document.getElementById('nav-category-filter');
   if (catFilter) {
@@ -177,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 初始化加载分类和导航数据
+// 初始化：先加载分类，再加载导航
 document.addEventListener('DOMContentLoaded', async () => {
   await fetchCategories();
   await loadNavLinks();
@@ -244,7 +245,7 @@ function renderNavTable(list) {
     tbody.appendChild(tr);
   });
 
-  // 拖拽排序只针对当前分类
+  // 拖拽排序（只针对当前筛选数据）
   Sortable.create(tbody, {
     animation: 150,
     handle: '.drag-handle',
@@ -339,4 +340,14 @@ document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn =
     }
     if (tab === 'cat') loadCategories();
   };
-}
+});
+
+// ===================== 初始化 =====================
+document.addEventListener('DOMContentLoaded', async () => {
+  // 先加载分类，再加载导航
+  await fetchCategories();
+  await loadNavLinks();
+});
+
+// ===================== 登录/密码修改 =====================
+// 你的原有登录/密码相关代码可保持不变
