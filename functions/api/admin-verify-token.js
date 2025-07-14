@@ -5,7 +5,7 @@ export async function onRequestPost(context) {
 
   let payload;
   try {
-    payload = await verifyJWT(token, env.JWT_SECRET); // 用你已有的 verifyJWT
+    payload = await verifyJWT(token, env.JWT_SECRET);
     if (!payload || !payload.adminId) throw new Error();
   } catch (e) {
     return new Response(JSON.stringify({ msg: '登录已过期，请重新登录' }), { status: 401 });
@@ -14,4 +14,24 @@ export async function onRequestPost(context) {
   return new Response(JSON.stringify({ success: true }), { status: 200 });
 }
 
-// 可以直接复用你 admin-change-password.js 里的 verifyJWT
+// 直接复用你已写的 verifyJWT 方法
+async function verifyJWT(token, secret) {
+  const [headerB64, payloadB64, signatureB64] = token.split('.');
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+  const valid = await crypto.subtle.verify(
+    "HMAC",
+    key,
+    Uint8Array.from(atob(signatureB64), c => c.charCodeAt(0)),
+    new TextEncoder().encode(headerB64 + "." + payloadB64)
+  );
+  if (!valid) return null;
+  const payload = JSON.parse(atob(payloadB64));
+  if (payload.exp && payload.exp < Math.floor(Date.now()/1000)) return null;
+  return payload;
+}
