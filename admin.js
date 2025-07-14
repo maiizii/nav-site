@@ -15,19 +15,19 @@ let allCategories = [];
 let currentNavCategoryFilter = "";
 
 // ===================== 工具函数 =====================
-// 获取token统一方法
 function getAdminToken() {
   return localStorage.getItem('adminToken');
 }
-
-// fetch带token
 async function fetchWithAuth(url, options = {}) {
   options.headers = options.headers || {};
   options.headers['Authorization'] = 'Bearer ' + getAdminToken();
   return fetch(url, options);
 }
 
-// ===================== 登录/密码修改 =====================
+// ========== 登录/密码修改 ==========
+let loginChecked = false;
+let isLoggingOut = false;
+
 async function showLoginModal(msg) {
   document.getElementById('adminLoginModal').style.display = 'flex';
   document.getElementById('adminLoginMsg').textContent = msg || '';
@@ -51,7 +51,9 @@ async function verifyToken() {
     return true;
   } catch (e) { return false; }
 }
+
 async function ensureLogin() {
+  if (loginChecked) return true;
   document.getElementById('adminLoginModal').style.display = 'none';
   await new Promise(r => setTimeout(r, 200));
   if (!await verifyToken()) {
@@ -61,11 +63,13 @@ async function ensureLogin() {
       return false;
     }
   }
+  loginChecked = true;
   hideLoginModal();
   return true;
 }
+
+// ========== 登录弹窗事件 ==========
 document.addEventListener('DOMContentLoaded', () => {
-  // 登录弹窗事件
   document.getElementById('adminLoginBtn').onclick = async function () {
     const username = document.getElementById('adminLoginUser').value.trim();
     const password = document.getElementById('adminLoginPwd').value;
@@ -83,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = await resp.json();
     if (resp.ok && data.token) {
       localStorage.setItem('adminToken', data.token);
+      loginChecked = false;
       hideLoginModal();
       setTimeout(() => { location.reload(); }, 600);
     } else {
@@ -90,13 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // 退出登录
   document.getElementById('adminLogoutBtn').onclick = function () {
+    if (isLoggingOut) return;
+    isLoggingOut = true;
     localStorage.removeItem('adminToken');
+    loginChecked = false;
     location.reload();
   };
 
-  // 修改密码弹窗显示
   document.getElementById('adminChangePwdShowBtn').onclick = function () {
     document.getElementById('adminChangePwdModal').style.display = 'flex';
     document.getElementById('adminChangePwdMsg').textContent = '';
@@ -105,12 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('changeNewPwd2').value = '';
   };
 
-  // 取消修改密码
   document.getElementById('adminChangePwdCancelBtn').onclick = function () {
     document.getElementById('adminChangePwdModal').style.display = 'none';
   };
 
-  // 修改密码提交（带二次输入验证）
   document.getElementById('adminChangePwdBtn').onclick = async function () {
     const oldPwd = document.getElementById('changeOldPwd').value;
     const newPwd = document.getElementById('changeNewPwd').value;
@@ -143,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
       msgEl.textContent = '密码修改成功，请重新登录！';
       setTimeout(() => {
         localStorage.removeItem('adminToken');
+        loginChecked = false;
         window.location.reload();
       }, 1200);
     } else {
@@ -151,6 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 });
 
+// ========== 登录验证 ==========
+// 页面加载时强制登录验证，只弹一次弹窗
 (async function () {
   if (!await ensureLogin()) return;
   document.getElementById('adminLogoutBtn').style.display = '';
@@ -217,7 +224,7 @@ function renderCategoryTable(list) {
       <td><input type="text" value="${cat.name}" id="name-${cat.id}" /></td>
       <td>
         <button class="save-cat-btn" data-id="${cat.id}">保存</button>
-        <button class="del-cat-btn" data-id="${cat.id}">删除</button>
+        <button class="del-cat-btn danger" data-id="${cat.id}">删除</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -364,13 +371,12 @@ function renderNavTable(list) {
       <td><input type="text" value="${nav.icon || ''}" id="icon-${nav.id}" /></td>
       <td>
         <button class="save-btn" data-id="${nav.id}">保存</button>
-        <button class="del-btn" data-id="${nav.id}">删除</button>
+        <button class="del-btn danger" data-id="${nav.id}">删除</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 
-  // 拖拽排序（只针对当前筛选数据）
   Sortable.create(tbody, {
     animation: 150,
     handle: '.drag-handle',
@@ -450,6 +456,8 @@ function renderNavTable(list) {
 }
 
 // ===================== Tab切换 =====================
+// 首次进入不显示任何tab，点击后才显示
+let tabEverActivated = {};
 document.querySelectorAll('.admin-sidebar-item').forEach(btn => {
   btn.onclick = async function () {
     document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
@@ -462,11 +470,15 @@ document.querySelectorAll('.admin-sidebar-item').forEach(btn => {
       await loadNavLinks();
     }
     if (tab === 'cat') loadCategories();
+    tabEverActivated[tab] = true;
   };
 });
 
-// 初始化：先加载分类，再加载导航
+// 页面初始化不激活tab，登录后左侧栏可点，但内容不显示，需点击
 document.addEventListener('DOMContentLoaded', async () => {
-  await fetchCategories();
-  await loadNavLinks();
+  if (await ensureLogin()) {
+    // 不激活任何tab
+    document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+  }
 });
