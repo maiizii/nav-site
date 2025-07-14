@@ -12,8 +12,21 @@ const CAT_SORT_API = "/api/nav-categories/sort";
 
 let allCategories = [];
 
+// 获取token统一方法
+function getAdminToken() {
+  return localStorage.getItem('adminToken');
+}
+
+// fetch带token
+async function fetchWithAuth(url, options = {}) {
+  options.headers = options.headers || {};
+  options.headers['Authorization'] = 'Bearer ' + getAdminToken();
+  return fetch(url, options);
+}
+
+// 分类接口
 async function fetchCategories() {
-  const res = await fetch(CAT_API);
+  const res = await fetchWithAuth(CAT_API);
   const cats = (await res.json()).data || [];
   allCategories = cats;
 }
@@ -38,7 +51,7 @@ document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn =
 
 // 导航管理表格渲染
 async function loadNavLinks() {
-  const res = await fetch(API);
+  const res = await fetchWithAuth(API);
   const links = (await res.json()).data || [];
   renderNavTable(links);
 }
@@ -114,7 +127,7 @@ function renderNavTable(list) {
         const id = tr.getAttribute('data-id');
         if (id) newOrder.push({ id: Number(id), sort: idx + 1 });
       });
-      fetch(SORT_API, {
+      fetchWithAuth(SORT_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newOrder)
@@ -136,7 +149,7 @@ function renderNavTable(list) {
         description: document.getElementById(`desc-${id}`).value,
         icon: document.getElementById(`icon-${id}`).value
       };
-      await fetch(SAVE_API, {
+      await fetchWithAuth(SAVE_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -150,7 +163,7 @@ function renderNavTable(list) {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
       if (!confirm('确定要删除吗？')) return;
-      await fetch(DEL_API, {
+      await fetchWithAuth(DEL_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
@@ -168,7 +181,7 @@ function renderNavTable(list) {
       description: document.getElementById('add-description').value,
       icon: document.getElementById('add-icon').value
     };
-    await fetch(ADD_API, {
+    await fetchWithAuth(ADD_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -184,7 +197,7 @@ function renderNavTable(list) {
 
 // 分类管理表格渲染
 async function loadCategories() {
-  const res = await fetch(CAT_API);
+  const res = await fetchWithAuth(CAT_API);
   const cats = (await res.json()).data || [];
   renderCategoryTable(cats);
 }
@@ -240,7 +253,7 @@ function renderCategoryTable(list) {
         const id = tr.getAttribute('data-id');
         if (id) newOrder.push({ id: Number(id), sort: idx + 1 });
       });
-      fetch(CAT_SORT_API, {
+      fetchWithAuth(CAT_SORT_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newOrder)
@@ -258,7 +271,7 @@ function renderCategoryTable(list) {
         id,
         name: document.getElementById(`name-${id}`).value
       };
-      await fetch(CAT_SAVE_API, {
+      await fetchWithAuth(CAT_SAVE_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -272,7 +285,7 @@ function renderCategoryTable(list) {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
       if (!confirm('确定要删除该分类吗？')) return;
-      await fetch(CAT_DEL_API, {
+      await fetchWithAuth(CAT_DEL_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
@@ -285,7 +298,7 @@ function renderCategoryTable(list) {
   document.getElementById('add-cat-btn').onclick = async () => {
     const name = document.getElementById('add-cat-name').value;
     if (!name.trim()) return;
-    await fetch(CAT_ADD_API, {
+    await fetchWithAuth(CAT_ADD_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name })
@@ -297,6 +310,11 @@ function renderCategoryTable(list) {
 
 // 默认加载
 document.addEventListener('DOMContentLoaded', async () => {
+  // 登录校验（依赖admin.html里的window.adminToken赋值）
+  if (!window.adminToken) {
+    // 未登录，直接不加载
+    return;
+  }
   await fetchCategories();
   loadNavLinks();
 });
