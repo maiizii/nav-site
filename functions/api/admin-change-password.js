@@ -1,6 +1,6 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
-  // 强化：输出JWT_SECRET到日志
+  // 输出JWT_SECRET到日志
   console.log('[admin-change-password] env.JWT_SECRET =', env.JWT_SECRET);
   if (!env.JWT_SECRET) {
     return new Response(JSON.stringify({ msg: '服务器端JWT_SECRET未配置' }), { status: 500 });
