@@ -65,4 +65,4 @@
 
 ---
 
-项目地址：[https://github.com/macgowge/nav-site](https://github.com/macgowge/nav-site)
+项目地址：[https://github.com/maiizii/nav-site](https://github.com/maiizii/nav-site)
