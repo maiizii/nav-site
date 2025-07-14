@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
-    // 强化：输出JWT_SECRET到日志
+    // 输出JWT_SECRET到日志
     console.log('[admin-login] env.JWT_SECRET =', env.JWT_SECRET);
     if (!env.JWT_SECRET) {
       return new Response(JSON.stringify({ msg: '服务器端JWT_SECRET未配置' }), { status: 500 });
@@ -24,7 +24,7 @@ export async function onRequestPost(context) {
     const hashBuf = await crypto.subtle.digest("SHA-256", data);
     const hashHex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
 
-    // 日志输出，方便调试
+    // 日志输出
     console.log("输入密码:", password);
     console.log("计算hash:", hashHex);
     console.log("数据库hash:", admin.password_hash);
