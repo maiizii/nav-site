@@ -484,11 +484,3 @@ document.querySelectorAll('.admin-sidebar-item').forEach(btn => {
     tabEverActivated[tab] = true;
   };
 });
-
-// 页面初始化不激活tab，登录后左侧栏可点，但内容不显示，需点击
-document.addEventListener('DOMContentLoaded', async () => {
-  if (await ensureLogin()) {
-    document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
-  }
-});
