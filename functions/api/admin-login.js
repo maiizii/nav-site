@@ -15,12 +15,11 @@ export async function onRequestPost(context) {
   const data = enc.encode(password);
   const hashBuf = await crypto.subtle.digest("SHA-256", data);
   const hashHex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
-
   if (hashHex !== admin.password_hash) {
     return new Response(JSON.stringify({ msg: "用户名或密码错误" }), { status: 401 });
   }
 
-  // 生成 JWT（简单实现，无库依赖）
+  // 生成 JWT
   const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const payload = btoa(JSON.stringify({ adminId: admin.id, username, exp: Math.floor(Date.now()/1000) + 7200 }));
   const signature = await signJWT(header, payload, env.JWT_SECRET);
@@ -29,7 +28,6 @@ export async function onRequestPost(context) {
   return new Response(JSON.stringify({ token }), { status: 200 });
 }
 
-// 简单 HMAC-SHA256 JWT签名
 async function signJWT(header, payload, secret) {
   const key = await crypto.subtle.importKey(
     "raw",
