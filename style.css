@@ -95,6 +95,11 @@ body {
   gap: 0;
   min-width: 0;
 }
+/* 让“设置”按钮推到最右 */
+.header-btn#settings-btn,
+.header-btn.setting-btn {
+  margin-left: auto;
+}
 .header-btn {
   background: none;
   color: #222;
@@ -107,6 +112,7 @@ body {
   cursor: pointer;
   transition: color .16s;
   font-family: inherit;
+  text-decoration: none;
 }
 .header-btn:hover {
   color: #1ca57d;
