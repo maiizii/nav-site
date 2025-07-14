@@ -29,7 +29,7 @@ let loginChecked = false;
 let isLoggingOut = false;
 let loginModalShown = false;
 
-async function showLoginModal(msg) {
+function showLoginModal(msg) {
   if (loginModalShown) return;
   loginModalShown = true;
   document.getElementById('adminLoginModal').style.display = 'flex';
@@ -56,20 +56,19 @@ async function verifyToken() {
   } catch (e) { return false; }
 }
 
-async function ensureLogin() {
+// 自动重试ensureLogin
+async function ensureLogin(maxRetry = 3, retryInterval = 500) {
   if (loginChecked) return true;
-  document.getElementById('adminLoginModal').style.display = 'none';
-  await new Promise(r => setTimeout(r, 180));
-  if (!await verifyToken()) {
-    await new Promise(r => setTimeout(r, 300));
-    if (!await verifyToken()) {
-      showLoginModal();
-      return false;
+  for (let i = 0; i < maxRetry; i++) {
+    if (await verifyToken()) {
+      loginChecked = true;
+      hideLoginModal();
+      return true;
     }
+    await new Promise(r => setTimeout(r, retryInterval));
   }
-  loginChecked = true;
-  hideLoginModal();
-  return true;
+  showLoginModal();
+  return false;
 }
 
 // ========== 登录弹窗事件 ==========
@@ -93,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('adminToken', data.token);
       loginChecked = false;
       hideLoginModal();
-      setTimeout(() => { location.reload(); }, 600);
+      setTimeout(() => { location.reload(); }, 1200); // 延迟1.2秒
     } else {
       msgEl.textContent = data.msg || '登录失败';
     }
@@ -110,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('adminLogoutConfirmModal').style.display = 'none';
     localStorage.removeItem('adminToken');
     loginChecked = false;
-    location.reload();
+    setTimeout(() => location.reload(), 500);
   };
 
   document.getElementById('adminLogoutCancelBtn').onclick = function () {
@@ -163,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('adminToken');
         loginChecked = false;
         window.location.reload();
-      }, 1200);
+      }, 1200); // 延迟1.2秒
     } else {
       msgEl.textContent = data.msg || '密码修改失败';
     }
@@ -172,12 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ========== 登录验证 ==========
 // 页面加载时强制登录验证，只弹一次弹窗
-(async function () {
-  if (!await ensureLogin()) return;
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!await ensureLogin(3, 500)) return;
   document.getElementById('adminLogoutBtn').style.display = '';
   document.getElementById('adminChangePwdShowBtn').style.display = '';
   window.adminToken = localStorage.getItem('adminToken');
-})();
+  // 页面初始化不激活tab，登录后左侧栏可点，但内容不显示，需点击
+  document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+});
 
 // ===================== 分类管理 =====================
 async function fetchCategories() {
