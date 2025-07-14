@@ -27,7 +27,10 @@ async function fetchWithAuth(url, options = {}) {
 // 分类接口
 async function fetchCategories() {
   const res = await fetchWithAuth(CAT_API);
-  const cats = (await res.json()).data || [];
+  const json = await res.json();
+  const cats = json.data || [];
+  // 按sort字段升序排序
+  cats.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   allCategories = cats;
 }
 
@@ -43,7 +46,7 @@ document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn =
     document.getElementById('tab-' + tab).classList.add('active');
     if (tab === 'nav') {
       await fetchCategories();
-      loadNavLinks();
+      await loadNavLinks();
     }
     if (tab === 'cat') loadCategories();
   };
@@ -52,7 +55,24 @@ document.querySelectorAll('.admin-menu-link, .admin-sidebar-item').forEach(btn =
 // 导航管理表格渲染
 async function loadNavLinks() {
   const res = await fetchWithAuth(API);
-  const links = (await res.json()).data || [];
+  if (res.status === 401) {
+    showLoginModal && showLoginModal('请重新登录');
+    return;
+  }
+  const json = await res.json();
+  let links = json.data || [];
+  // 按分类排序（先分类sort，再导航sort）
+  if (Array.isArray(allCategories) && allCategories.length) {
+    // 构造分类顺序映射
+    const catOrder = {};
+    allCategories.forEach((cat, idx) => { catOrder[cat.name] = idx; });
+    links.sort((a, b) => {
+      const aCatIdx = catOrder[a.category] ?? 9999;
+      const bCatIdx = catOrder[b.category] ?? 9999;
+      if (aCatIdx !== bCatIdx) return aCatIdx - bCatIdx;
+      return (a.sort || 0) - (b.sort || 0);
+    });
+  }
   renderNavTable(links);
 }
 
@@ -198,7 +218,9 @@ function renderNavTable(list) {
 // 分类管理表格渲染
 async function loadCategories() {
   const res = await fetchWithAuth(CAT_API);
-  const cats = (await res.json()).data || [];
+  const json = await res.json();
+  const cats = json.data || [];
+  cats.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   renderCategoryTable(cats);
 }
 
@@ -310,11 +332,7 @@ function renderCategoryTable(list) {
 
 // 默认加载
 document.addEventListener('DOMContentLoaded', async () => {
-  // 登录校验（依赖admin.html里的window.adminToken赋值）
-  if (!window.adminToken) {
-    // 未登录，直接不加载
-    return;
-  }
+  if (!window.adminToken) return;
   await fetchCategories();
-  loadNavLinks();
+  await loadNavLinks();
 });
