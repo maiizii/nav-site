@@ -2,19 +2,20 @@
 <html lang="zh-cn">
 <head>
   <meta charset="UTF-8" />
-  <title>TKCall后台管理</title>
+  <title>TK客网站导航</title>
+  <link rel="icon" href="/tc.png" />
   <link rel="stylesheet" href="./admin.css" />
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
-  <header class="admin-header">
+  <header class="admin-header glass-header">
     <div class="admin-header-inner">
       <div class="admin-logo">
-        <img class="logo-img" src="https://cdn.tkcall.com/original/1X/f7179d7be06f3e071b52597b87b06d1ef9af30e5.png" alt="logo" />
-        <span class="logo-title">TKCall后台管理</span>
+        <img class="logo-img" src="/tkcall_logo.png" alt="logo" />
+        <span class="site-nav-title">网站导航</span>
       </div>
       <nav class="admin-menu">
-        <a class="admin-index-link" href="index" target="_blank">首页</a>
+        <a class="admin-index-link" href="index">首页</a>
         <button id="adminChangePwdShowBtn" class="admin-logout-btn" style="display:none;">修改密码</button>
         <button id="adminLogoutBtn" class="admin-logout-btn" style="display:none;">退出登录</button>
       </nav>
@@ -45,7 +46,7 @@
     </main>
   </div>
   <footer>
-    <p>© 2025 TKCall后台管理</p>
+    <p>© 2025 TK客网站导航</p>
   </footer>
 
   <!-- 登录弹窗 -->
@@ -68,7 +69,7 @@
       <input id="changeNewPwd" type="password" placeholder="新密码" autocomplete="new-password" />
       <input id="changeNewPwd2" type="password" placeholder="再次输入新密码" autocomplete="new-password" />
       <button id="adminChangePwdBtn">确认修改</button>
-      <button id="adminChangePwdCancelBtn" style="background:#eee;color:#666;margin-top:10px;">取消</button>
+      <button id="adminChangePwdCancelBtn" class="admin-btn-cancel" type="button">取消</button>
     </div>
   </div>
 
