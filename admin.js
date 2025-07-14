@@ -60,7 +60,6 @@ async function loadNavLinks() {
   }
   const json = await res.json();
   let links = json.data || [];
-  // 按分类排序（先分类sort，再导航sort）
   if (Array.isArray(allCategories) && allCategories.length) {
     const catOrder = {};
     allCategories.forEach((cat, idx) => { catOrder[cat.name] = idx; });
@@ -135,7 +134,6 @@ function renderNavTable(list) {
     tbody.appendChild(tr);
   });
 
-  // 拖拽排序
   Sortable.create(tbody, {
     animation: 150,
     handle: '.drag-handle',
@@ -155,7 +153,6 @@ function renderNavTable(list) {
     }
   });
 
-  // 保存（编辑导航项）
   tbody.querySelectorAll('.save-btn').forEach(btn => {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
@@ -176,7 +173,6 @@ function renderNavTable(list) {
     };
   });
 
-  // 删除
   tbody.querySelectorAll('.del-btn').forEach(btn => {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
@@ -190,7 +186,6 @@ function renderNavTable(list) {
     };
   });
 
-  // 新增
   document.getElementById('add-btn').onclick = async () => {
     const payload = {
       title: document.getElementById('add-title').value,
@@ -213,7 +208,49 @@ function renderNavTable(list) {
   };
 }
 
-// 分类管理表格渲染
+// 密码修改事件（假定你有相关按钮和输入框）
+const changePwdBtn = document.getElementById('change-password-btn');
+if (changePwdBtn) {
+  changePwdBtn.onclick = async () => {
+    const oldPassword = document.getElementById('old-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const resp = await fetch('/api/admin-change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAdminToken() },
+      body: JSON.stringify({ oldPassword, newPassword, })
+    });
+    const json = await resp.json();
+    if (json.msg === '密码修改成功') {
+      alert('密码修改成功，请重新登录');
+      localStorage.removeItem('adminToken');
+      setTimeout(() => { location.reload(); }, 1200);
+    } else {
+      alert(json.msg || '修改失败');
+    }
+  };
+}
+
+// 登录事件（假定你有相关按钮和输入框）
+const loginBtn = document.getElementById('login-btn');
+if (loginBtn) {
+  loginBtn.onclick = async () => {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const resp = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const json = await resp.json();
+    if (json.token) {
+      localStorage.setItem('adminToken', json.token);
+      setTimeout(() => { location.reload(); }, 1200);
+    } else {
+      alert(json.msg || '登录失败');
+    }
+  };
+}
+
 async function loadCategories() {
   const res = await fetchWithAuth(CAT_API);
   const json = await res.json();
@@ -263,7 +300,6 @@ function renderCategoryTable(list) {
     tbody.appendChild(tr);
   });
 
-  // 拖拽排序
   Sortable.create(tbody, {
     animation: 150,
     handle: '.drag-handle',
@@ -283,7 +319,6 @@ function renderCategoryTable(list) {
     }
   });
 
-  // 保存（编辑分类）
   tbody.querySelectorAll('.save-cat-btn').forEach(btn => {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
@@ -300,7 +335,6 @@ function renderCategoryTable(list) {
     };
   });
 
-  // 删除
   tbody.querySelectorAll('.del-cat-btn').forEach(btn => {
     btn.onclick = async (e) => {
       const id = btn.getAttribute('data-id');
@@ -314,7 +348,6 @@ function renderCategoryTable(list) {
     };
   });
 
-  // 新增
   document.getElementById('add-cat-btn').onclick = async () => {
     const name = document.getElementById('add-cat-name').value;
     if (!name.trim()) return;
@@ -328,7 +361,6 @@ function renderCategoryTable(list) {
   };
 }
 
-// 默认加载
 document.addEventListener('DOMContentLoaded', async () => {
   if (!window.adminToken) return;
   await fetchCategories();
