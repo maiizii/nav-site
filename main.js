@@ -1,5 +1,3 @@
-// 适配 style.css 结构，分类侧栏/内容区都按 sort 排序，浮动卡片浅底深色文字，TOP/设置按钮功能
-
 let allLinks = [];
 let allCategories = [];
 let currentCategory = '';
@@ -191,10 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
     topBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // 设置按钮弹窗或自定义功能
+  // 设置按钮直接跳转到 admin 页面
   const settingsBtn = document.getElementById('settings-btn');
   if (settingsBtn) {
-    settingsBtn.onclick = () => alert('这里可以打开设置弹窗');
+    settingsBtn.onclick = () => {
+      window.location.href = 'admin';
+    };
   }
 });
 
