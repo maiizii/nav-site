@@ -13,6 +13,7 @@ const CAT_SORT_API = "/api/nav-categories/sort";
 
 let allCategories = [];
 let currentNavCategoryFilter = "";
+let currentNavSubCategoryFilter = "";
 
 // ===================== 工具函数 =====================
 function getAdminToken() {
@@ -185,15 +186,44 @@ async function fetchCategories() {
   allCategories = json.data || [];
   allCategories.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
-  // 构建分组/树形下拉
+  // 构建两级下拉
   const catFilter = document.getElementById('nav-category-filter');
+  const subCatFilter = document.getElementById('nav-subcategory-filter');
   if (catFilter) {
+    // 一级分类
+    const level1 = allCategories.filter(c => !c.parent_id);
     catFilter.innerHTML = `<option value="">全部</option>` +
-      allCategories.map(c =>
-        `<option value="${c.id}">${c.parent_id ? '— ' : ''}${c.name}</option>`
+      level1.map(c =>
+        `<option value="${c.id}">${c.name}</option>`
       ).join('');
-    catFilter.value = currentNavCategoryFilter;
+    catFilter.value = currentNavCategoryFilter || "";
+    // 处理二级下拉
+    renderSubCategoryFilter();
   }
+}
+
+function renderSubCategoryFilter() {
+  const catFilter = document.getElementById('nav-category-filter');
+  const subCatFilter = document.getElementById('nav-subcategory-filter');
+  const selectedCatId = catFilter.value;
+  if (!selectedCatId) {
+    subCatFilter.style.display = "none";
+    subCatFilter.innerHTML = "";
+    currentNavSubCategoryFilter = "";
+    return;
+  }
+  // 找出所有二级分类
+  const subCategories = allCategories.filter(c => String(c.parent_id) === String(selectedCatId));
+  if (subCategories.length === 0) {
+    subCatFilter.style.display = "none";
+    subCatFilter.innerHTML = "";
+    currentNavSubCategoryFilter = "";
+    return;
+  }
+  subCatFilter.style.display = "";
+  subCatFilter.innerHTML = `<option value="">全部</option>` +
+    subCategories.map(sc => `<option value="${sc.id}">${sc.name}</option>`).join('');
+  subCatFilter.value = currentNavSubCategoryFilter || "";
 }
 
 async function loadCategories() {
@@ -330,17 +360,41 @@ async function loadNavLinks() {
   }
   const json = await res.json();
   let links = json.data || [];
-  if (currentNavCategoryFilter) {
-    links = links.filter(link => String(link.category_id) === String(currentNavCategoryFilter));
+
+  // 筛选
+  if (currentNavSubCategoryFilter) {
+    links = links.filter(link => String(link.category_id) === String(currentNavSubCategoryFilter));
+  } else if (currentNavCategoryFilter) {
+    // 选了一级但没选二级时，显示一级及其所有二级分类下的内容
+    const subCats = allCategories.filter(c => String(c.parent_id) === String(currentNavCategoryFilter));
+    if (subCats.length === 0) {
+      links = links.filter(link => String(link.category_id) === String(currentNavCategoryFilter));
+    } else {
+      const ids = subCats.map(c => String(c.id));
+      links = links.filter(link =>
+        String(link.category_id) === String(currentNavCategoryFilter) ||
+        ids.includes(String(link.category_id))
+      );
+    }
   }
   renderNavTable(links);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 一级分类筛选
   const catFilter = document.getElementById('nav-category-filter');
+  const subCatFilter = document.getElementById('nav-subcategory-filter');
   if (catFilter) {
     catFilter.onchange = () => {
       currentNavCategoryFilter = catFilter.value;
+      currentNavSubCategoryFilter = "";
+      renderSubCategoryFilter();
+      loadNavLinks();
+    };
+  }
+  if (subCatFilter) {
+    subCatFilter.onchange = () => {
+      currentNavSubCategoryFilter = subCatFilter.value;
       loadNavLinks();
     };
   }
@@ -462,7 +516,9 @@ function renderNavTable(list) {
   });
 
   const addCatSelect = document.getElementById('add-category');
-  if (currentNavCategoryFilter && addCatSelect) {
+  if (currentNavSubCategoryFilter) {
+    addCatSelect.value = currentNavSubCategoryFilter;
+  } else if (currentNavCategoryFilter && addCatSelect) {
     addCatSelect.value = currentNavCategoryFilter;
   }
 
