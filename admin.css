@@ -314,3 +314,20 @@ footer {
   margin: 44px 0 14px 0;
   text-shadow: 0 2px 6px #fff;
 }
+
+/* 分类筛选栏样式 */
+.nav-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#nav-subcategory-filter {
+  min-width: 120px;
+}
+@media (max-width: 900px) {
+  .admin-header-inner { padding: 0 14px;}
+  .admin-container { gap: 11px; padding: 0 1vw;}
+  .admin-sidebar { width: 100px; }
+  .admin-main-content { padding: 18px 1vw 18px 1vw;}
+  .admin-sidebar-list { gap: 9px;}
+}
