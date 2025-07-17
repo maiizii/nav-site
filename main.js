@@ -58,7 +58,7 @@ async function loadLinks() {
   renderLinks(allLinks);
 }
 
-// 主内容区渲染：只显示当前一级分类
+// 首页主内容区渲染
 function renderLinks(links) {
   const main = document.getElementById('main');
   main.innerHTML = '';
@@ -77,23 +77,74 @@ function renderLinks(links) {
     return;
   }
 
-  // 当前选中分类区域
-  let cat;
+  // “全部”时分组显示所有一级分类
   if (!currentCategory) {
-    // 默认第一个一级分类
+    // 按一级分类分组
     const level1Cats = allCategories.filter(cat => !cat.parent_id)
       .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
-    if (level1Cats.length === 0) return;
-    cat = level1Cats[0];
-    currentCategory = String(cat.id);
-    // 切换一级分类时，自动选中第一个子分类（如果有）
-    const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
-      .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
-    currentSubCategory = subCats.length > 0 ? String(subCats[0].id) : '';
-  } else {
-    cat = allCategories.find(c => String(c.id) === String(currentCategory));
-    if (!cat) return;
+    level1Cats.forEach(cat => {
+      // 二级分类
+      const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
+        .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
+
+      // 一级分类区块
+      const section = document.createElement('section');
+      section.className = 'group-section';
+
+      // 标题和二级标签同行
+      let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
+      if (subCats.length > 0) {
+        sectionHTML += `<div class="subcat-tabs">`;
+        subCats.forEach((subCat, idx) => {
+          sectionHTML += `<button class="subcat-tab${idx === 0 ? ' active' : ''}" data-subcat-id="${subCat.id}">${subCat.name}</button>`;
+        });
+        sectionHTML += `</div>`;
+      }
+      sectionHTML += `</div>`;
+      sectionHTML += `<div class="nav-list"></div>`;
+      section.innerHTML = sectionHTML;
+      main.appendChild(section);
+
+      // 内容渲染
+      const navList = section.querySelector('.nav-list');
+      if (subCats.length > 0) {
+        // 默认显示第一个二级分类内容
+        let currentSubCatId = subCats[0].id;
+        renderLinksForCategory(showLinks, currentSubCatId, navList);
+
+        // tab切换事件（只影响该区块的内容）
+        const tabBtns = section.querySelectorAll('.subcat-tab');
+        tabBtns.forEach((tabBtn, idx) => {
+          tabBtn.onclick = function() {
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+            tabBtn.classList.add('active');
+            currentSubCatId = subCats[idx].id;
+            renderLinksForCategory(showLinks, currentSubCatId, navList);
+          };
+        });
+      } else {
+        // 只显示一级分类下的内容
+        renderLinksForCategory(showLinks, cat.id, navList);
+      }
+    });
+
+    // 未分组
+    const ungrouped = showLinks.filter(l => !allCategories.some(c => String(c.id) === String(l.category_id)));
+    if (ungrouped.length > 0) {
+      const section = document.createElement('section');
+      section.className = 'group-section';
+      section.innerHTML = `<h2 class="group-title">未分组</h2><div class="nav-list"></div>`;
+      const navList = section.querySelector('.nav-list');
+      ungrouped.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
+        .forEach(link => navList.appendChild(createNavCard(link)));
+      main.appendChild(section);
+    }
+    return;
   }
+
+  // 只显示当前一级分类区块
+  const cat = allCategories.find(c => String(c.id) === String(currentCategory));
+  if (!cat) return;
 
   // 二级分类
   const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
