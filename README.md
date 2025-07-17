@@ -16,6 +16,28 @@
 
 ---
 
+## 数据库升级说明
+
+如果已有旧版数据库，升级时请注意：
+
+1. **分类表升级**  
+   如果 `nav_categories` 已存在但没有 `parent_id` 字段，可用如下 SQL 补充：
+   ```sql
+   ALTER TABLE nav_categories ADD COLUMN parent_id INTEGER DEFAULT NULL;
+   ```
+
+2. **导航链接表升级**  
+   如果 `nav_links` 已存在但没有 `category_id` 字段，可补充：
+   ```sql
+   ALTER TABLE nav_links ADD COLUMN category_id INTEGER;
+   ```
+
+3. **兼容性说明**  
+   - 原有 `category` 字段仍可兼容旧数据，后续可逐步迁移到 `category_id`。
+   - 顶级分类的 `parent_id` 设为 NULL，导航项建议归属到具体子分类。
+
+---
+
 ## 特性
 
 - Cloudflare Pages + D1 Serverless 数据库，无需 MySQL/Redis
@@ -29,7 +51,7 @@
 
 1. **准备 Cloudflare D1 数据库**
    - 在 Cloudflare 控制台创建 D1 数据库
-   - 使用 `cloudflare/schema.sql` 初始化表结构（注意本版本需 parent_id 字段）
+   - 使用 `cloudflare/schema.sql` 初始化表结构（注意本版本需 parent_id、category_id 字段）
 
 2. **配置 wrangler.toml**
    - 填入 D1 数据库信息
@@ -62,7 +84,7 @@
 ## 主要 API 接口
 
 - `GET /api/nav-categories/list` 获取分类列表（含 parent_id 字段）
-- `GET /api/nav-links/list` 获取导航列表
+- `GET /api/nav-links/list` 获取导航列表（建议使用 category_id 字段归类）
 - `POST /api/nav-links/add` 新增导航
 - `POST /api/nav-links/update` 修改导航
 - `POST /api/nav-links/delete` 删除导航
@@ -76,6 +98,7 @@
 
 - 升级前的单级分类数据自动为顶级分类
 - 导航项未归类时可批量迁移到子分类
+- 原有 category 字段兼容，推荐逐步迁移至 category_id
 
 ---
 
