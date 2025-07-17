@@ -1,7 +1,7 @@
 let allLinks = [];
 let allCategories = [];
-let currentCategory = ''; // 记录当前选中的一级分类id
-let currentSubCategory = ''; // 记录当前选中的二级分类id
+let currentCategory = ''; // 当前选中的一级分类id
+let currentSubCategory = ''; // 当前选中的二级分类id
 let currentSearch = '';
 let tooltipTimer = null;
 
@@ -35,14 +35,14 @@ function renderCategoryList() {
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
   level1Cats.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'category-item' + (currentCategory === cat.id ? ' active' : '');
+    btn.className = 'category-item' + (String(currentCategory) === String(cat.id) ? ' active' : '');
     btn.textContent = cat.name;
     btn.onclick = function() {
-      currentCategory = cat.id;
+      currentCategory = String(cat.id);
       // 切换一级分类时，自动选中第一个子分类（如果有）
-      const subCats = allCategories.filter(c => c.parent_id === cat.id)
+      const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
         .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
-      currentSubCategory = subCats.length > 0 ? subCats[0].id : '';
+      currentSubCategory = subCats.length > 0 ? String(subCats[0].id) : '';
       renderCategoryList();
       renderLinks(allLinks);
     };
@@ -83,7 +83,7 @@ function renderLinks(links) {
     const level1Cats = allCategories.filter(cat => !cat.parent_id)
       .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
     level1Cats.forEach(cat => {
-      const items = showLinks.filter(l => l.category_id === cat.id);
+      const items = showLinks.filter(l => String(l.category_id) === String(cat.id));
       if (items.length === 0) return;
       const section = document.createElement('section');
       section.className = 'group-section';
@@ -94,7 +94,7 @@ function renderLinks(links) {
       main.appendChild(section);
     });
     // 未分组
-    const ungrouped = showLinks.filter(l => !allCategories.some(c => c.id === l.category_id));
+    const ungrouped = showLinks.filter(l => !allCategories.some(c => String(c.id) === String(l.category_id)));
     if (ungrouped.length > 0) {
       const section = document.createElement('section');
       section.className = 'group-section';
@@ -108,7 +108,7 @@ function renderLinks(links) {
   }
 
   // 单一级分类时：是否有二级分类
-  const subCats = allCategories.filter(c => c.parent_id === currentCategory)
+  const subCats = allCategories.filter(c => String(c.parent_id) === String(currentCategory))
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
 
   if (subCats.length > 0) {
@@ -117,10 +117,10 @@ function renderLinks(links) {
     tabsBar.className = 'subcat-tabs';
     subCats.forEach((subCat, idx) => {
       const tab = document.createElement('button');
-      tab.className = 'subcat-tab' + (currentSubCategory === subCat.id ? ' active' : '');
+      tab.className = 'subcat-tab' + (String(currentSubCategory) === String(subCat.id) ? ' active' : '');
       tab.textContent = subCat.name;
       tab.onclick = function() {
-        currentSubCategory = subCat.id;
+        currentSubCategory = String(subCat.id);
         renderLinks(allLinks);
       };
       tabsBar.appendChild(tab);
@@ -128,8 +128,8 @@ function renderLinks(links) {
     main.appendChild(tabsBar);
 
     // 当前二级分类
-    const currentSubCat = subCats.find(c => c.id === currentSubCategory) || subCats[0];
-    const items = showLinks.filter(l => l.category_id === currentSubCat.id);
+    const currentSubCat = subCats.find(c => String(c.id) === String(currentSubCategory)) || subCats[0];
+    const items = showLinks.filter(l => String(l.category_id) === String(currentSubCat.id));
     const navList = document.createElement('div');
     navList.className = 'nav-list';
     items.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
@@ -138,7 +138,7 @@ function renderLinks(links) {
     return;
   } else {
     // 没有二级分类，直接显示一级分类下的网站
-    const items = showLinks.filter(l => l.category_id === currentCategory);
+    const items = showLinks.filter(l => String(l.category_id) === String(currentCategory));
     const navList = document.createElement('div');
     navList.className = 'nav-list';
     items.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
@@ -266,7 +266,7 @@ function hideTooltip() {
 }
 
 // 可在 style.css 增加如下样式让tab更美观
-
+/*
 .subcat-tabs {
   display: flex;
   gap: 16px;
@@ -287,3 +287,4 @@ function hideTooltip() {
   background: #88af8e;
   color: #fff;
 }
+*/
