@@ -95,7 +95,6 @@ body {
   gap: 0;
   min-width: 0;
 }
-/* 让“设置”按钮推到最右 */
 .header-btn#settings-btn,
 .header-btn.setting-btn {
   margin-left: auto;
@@ -261,21 +260,25 @@ body {
   gap: 42px;
 }
 
+/* 一级分类和二级分类标签同行 */
+.group-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.group-title {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #88af8e;
+  letter-spacing: 1px;
+}
+
 .group-section {
   display: grid;
   grid-template-rows: auto 1fr;
   grid-template-columns: 1fr;
-}
-.group-title {
-  font-size: 1.09em;
-  font-weight: 700;
-  color: #88af8e;
-  margin-bottom: 19px;
-  margin-top: 0;
-  letter-spacing: 1px;
-  grid-row: 1;
-  grid-column: 1;
-  justify-self: start;
 }
 
 .nav-list {
@@ -318,7 +321,7 @@ body {
   border-radius: 7px;
   vertical-align: middle;
   margin-right: 12px;
-  background: #fff; /* 图标透明底色用白色 */
+  background: #fff;
   object-fit: cover;
   flex-shrink: 0;
   border: 1px solid #edf3ee;
@@ -371,7 +374,6 @@ body {
   width: 100%;
 }
 
-/* 浮动注释卡片，#88af8e深色底、浅色字和箭头，文字不加粗 */
 .nav-tooltip {
   position: absolute;
   z-index: 9999;
@@ -436,6 +438,7 @@ footer {
   text-shadow: 0 2px 6px #fff;
 }
 
+/* 响应式适配 */
 @media (max-width: 1200px) {
   .container {
     padding: 0 8px;
@@ -542,10 +545,13 @@ footer {
     gap: 12px 0;
   }
 }
+
+/* 二级分类标签（subcat-tabs）在一行、靠右（已在上面 group-title-bar 设置） */
 .subcat-tabs {
   display: flex;
   gap: 16px;
-  margin-bottom: 22px;
+  margin-bottom: 0;
+  margin-left: auto;
 }
 .subcat-tab {
   border: none;
@@ -556,6 +562,7 @@ footer {
   font-size: 1em;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  margin-left: 0;
 }
 .subcat-tab.active,
 .subcat-tab:hover {

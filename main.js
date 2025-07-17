@@ -17,9 +17,10 @@ function renderCategoryList() {
   catBox.innerHTML = '';
   // “全部”按钮
   const allBtn = document.createElement('button');
-  allBtn.className = 'category-item active';
+  allBtn.className = 'category-item' + (currentSearch === '' ? ' active' : '');
   allBtn.textContent = '全部';
   allBtn.onclick = function() {
+    currentSearch = '';
     renderCategoryList();
     renderLinks(allLinks);
   };
@@ -33,8 +34,9 @@ function renderCategoryList() {
     btn.className = 'category-item';
     btn.textContent = cat.name;
     btn.onclick = function() {
+      currentSearch = '__category_' + cat.id;
       renderCategoryList();
-      // 首页模式不需要切换主内容区
+      renderLinks(allLinks);
     };
     catBox.appendChild(btn);
   });
@@ -55,7 +57,7 @@ function renderLinks(links) {
   let showLinks = links;
 
   // 搜索时平铺
-  if (currentSearch) {
+  if (currentSearch && !currentSearch.startsWith('__category_')) {
     showLinks = links.filter(l =>
       (l.title && l.title.includes(currentSearch)) ||
       (l.description && l.description.includes(currentSearch)) ||
@@ -69,7 +71,7 @@ function renderLinks(links) {
   const level1Cats = allCategories.filter(cat => !cat.parent_id && cat.parent_id !== 0)
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
 
-  // 每个区块维护自己的“当前二级分类”选中id
+  // 用于记忆每个区块的二级分类选中状态
   const subCatSelected = {};
 
   level1Cats.forEach(cat => {
@@ -81,28 +83,25 @@ function renderLinks(links) {
     const section = document.createElement('section');
     section.className = 'group-section';
 
-    let sectionHTML = `<h2 class="group-title">${cat.name}</h2>`;
-
+    // 顶部标题+标签栏放一行
+    let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
     if (subCats.length > 0) {
-      // 有二级分类时，显示tab
       sectionHTML += `<div class="subcat-tabs">`;
       subCats.forEach((subCat, idx) => {
         sectionHTML += `<button class="subcat-tab${idx === 0 ? ' active' : ''}" data-subcat-id="${subCat.id}">${subCat.name}</button>`;
       });
       sectionHTML += `</div>`;
-      sectionHTML += `<div class="nav-list subcat-nav-list"></div>`;
-      // 默认选第一个
       subCatSelected[cat.id] = subCats[0].id;
-    } else {
-      // 无二级分类
-      sectionHTML += `<div class="nav-list"></div>`;
     }
+    sectionHTML += `</div>`;
+    sectionHTML += `<div class="nav-list"></div>`;
     section.innerHTML = sectionHTML;
     main.appendChild(section);
 
     // 内容渲染
+    const navList = section.querySelector('.nav-list');
     if (subCats.length > 0) {
-      renderLinksForCategory(showLinks, subCatSelected[cat.id], section.querySelector('.nav-list'));
+      renderLinksForCategory(showLinks, subCatSelected[cat.id], navList);
       // tab切换事件（只影响该区块的内容）
       const tabBtns = section.querySelectorAll('.subcat-tab');
       tabBtns.forEach((tabBtn, idx) => {
@@ -110,12 +109,11 @@ function renderLinks(links) {
           tabBtns.forEach(btn => btn.classList.remove('active'));
           tabBtn.classList.add('active');
           subCatSelected[cat.id] = subCats[idx].id;
-          renderLinksForCategory(showLinks, subCats[idx].id, section.querySelector('.nav-list'));
+          renderLinksForCategory(showLinks, subCats[idx].id, navList);
         };
       });
     } else {
-      // 只显示一级分类下的内容
-      renderLinksForCategory(showLinks, cat.id, section.querySelector('.nav-list'));
+      renderLinksForCategory(showLinks, cat.id, navList);
     }
   });
 
