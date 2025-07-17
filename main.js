@@ -1,7 +1,5 @@
 let allLinks = [];
 let allCategories = [];
-let currentCategory = ''; // 当前选中的一级分类id
-let currentSubCategory = ''; // 当前选中的二级分类id
 let currentSearch = '';
 let tooltipTimer = null;
 
@@ -17,14 +15,11 @@ async function loadCategories() {
 function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
-
   // “全部”按钮
   const allBtn = document.createElement('button');
-  allBtn.className = 'category-item' + (currentCategory === '' ? ' active' : '');
+  allBtn.className = 'category-item active';
   allBtn.textContent = '全部';
   allBtn.onclick = function() {
-    currentCategory = '';
-    currentSubCategory = '';
     renderCategoryList();
     renderLinks(allLinks);
   };
@@ -35,16 +30,11 @@ function renderCategoryList() {
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
   level1Cats.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'category-item' + (String(currentCategory) === String(cat.id) ? ' active' : '');
+    btn.className = 'category-item';
     btn.textContent = cat.name;
     btn.onclick = function() {
-      currentCategory = String(cat.id);
-      // 切换一级分类时，自动选中第一个子分类（如果有）
-      const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
-        .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
-      currentSubCategory = subCats.length > 0 ? String(subCats[0].id) : '';
+      // 首页模式不需要切换主内容区，只是左侧高亮
       renderCategoryList();
-      renderLinks(allLinks);
     };
     catBox.appendChild(btn);
   });
@@ -58,94 +48,96 @@ async function loadLinks() {
   renderLinks(allLinks);
 }
 
-// 主内容区渲染
+// 首页主内容区渲染（全部）
 function renderLinks(links) {
   const main = document.getElementById('main');
   main.innerHTML = '';
   let showLinks = links;
 
-  // 搜索优先
+  // 搜索时平铺
   if (currentSearch) {
     showLinks = links.filter(l =>
       (l.title && l.title.includes(currentSearch)) ||
       (l.description && l.description.includes(currentSearch)) ||
       (l.url && l.url.includes(currentSearch))
     );
-    currentCategory = '';
-    currentSubCategory = '';
     renderSearchLinks(showLinks, main);
     return;
   }
 
-  // “全部”时分组显示所有一级分类
-  if (!currentCategory) {
-    // 按一级分类分组
-    const level1Cats = allCategories.filter(cat => !cat.parent_id)
-      .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
-    level1Cats.forEach(cat => {
-      const items = showLinks.filter(l => String(l.category_id) === String(cat.id));
-      if (items.length === 0) return;
-      const section = document.createElement('section');
-      section.className = 'group-section';
-      section.innerHTML = `<h2 class="group-title">${cat.name}</h2><div class="nav-list"></div>`;
-      const navList = section.querySelector('.nav-list');
-      items.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
-        .forEach(link => navList.appendChild(createNavCard(link)));
-      main.appendChild(section);
-    });
-    // 未分组
-    const ungrouped = showLinks.filter(l => !allCategories.some(c => String(c.id) === String(l.category_id)));
-    if (ungrouped.length > 0) {
-      const section = document.createElement('section');
-      section.className = 'group-section';
-      section.innerHTML = `<h2 class="group-title">未分组</h2><div class="nav-list"></div>`;
-      const navList = section.querySelector('.nav-list');
-      ungrouped.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
-        .forEach(link => navList.appendChild(createNavCard(link)));
-      main.appendChild(section);
-    }
-    return;
-  }
-
-  // 单一级分类时：是否有二级分类
-  const subCats = allCategories.filter(c => String(c.parent_id) === String(currentCategory))
+  // 按一级分类分组
+  const level1Cats = allCategories.filter(cat => !cat.parent_id)
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
 
-  if (subCats.length > 0) {
-    // 有二级分类，显示tab标签
-    const tabsBar = document.createElement('div');
-    tabsBar.className = 'subcat-tabs';
-    subCats.forEach((subCat, idx) => {
-      const tab = document.createElement('button');
-      tab.className = 'subcat-tab' + (String(currentSubCategory) === String(subCat.id) ? ' active' : '');
-      tab.textContent = subCat.name;
-      tab.onclick = function() {
-        currentSubCategory = String(subCat.id);
-        renderLinks(allLinks);
-      };
-      tabsBar.appendChild(tab);
-    });
-    main.appendChild(tabsBar);
+  // 每个区块维护自己的“当前二级分类”选中id
+  const subCatSelected = {};
 
-    // 当前二级分类
-    const currentSubCat = subCats.find(c => String(c.id) === String(currentSubCategory)) || subCats[0];
-    const items = showLinks.filter(l => String(l.category_id) === String(currentSubCat.id));
-    const navList = document.createElement('div');
-    navList.className = 'nav-list';
-    items.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
+  level1Cats.forEach(cat => {
+    // 二级分类
+    const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
+      .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
+
+    // 一级分类区块
+    const section = document.createElement('section');
+    section.className = 'group-section';
+
+    let sectionHTML = `<h2 class="group-title">${cat.name}</h2>`;
+
+    if (subCats.length > 0) {
+      // 有二级分类时，显示tab
+      sectionHTML += `<div class="subcat-tabs">`;
+      subCats.forEach((subCat, idx) => {
+        sectionHTML += `<button class="subcat-tab${idx === 0 ? ' active' : ''}" data-subcat-id="${subCat.id}">${subCat.name}</button>`;
+      });
+      sectionHTML += `</div>`;
+      sectionHTML += `<div class="nav-list subcat-nav-list"></div>`;
+      // 默认选第一个
+      subCatSelected[cat.id] = subCats[0].id;
+    } else {
+      // 无二级分类
+      sectionHTML += `<div class="nav-list"></div>`;
+    }
+    section.innerHTML = sectionHTML;
+    main.appendChild(section);
+
+    // 内容渲染
+    if (subCats.length > 0) {
+      renderLinksForCategory(showLinks, subCatSelected[cat.id], section.querySelector('.nav-list'));
+      // tab切换事件（只影响该区块的内容）
+      const tabBtns = section.querySelectorAll('.subcat-tab');
+      tabBtns.forEach((tabBtn, idx) => {
+        tabBtn.onclick = function() {
+          tabBtns.forEach(btn => btn.classList.remove('active'));
+          tabBtn.classList.add('active');
+          subCatSelected[cat.id] = subCats[idx].id;
+          renderLinksForCategory(showLinks, subCats[idx].id, section.querySelector('.nav-list'));
+        };
+      });
+    } else {
+      // 只显示一级分类下的内容
+      renderLinksForCategory(showLinks, cat.id, section.querySelector('.nav-list'));
+    }
+  });
+
+  // 未分组
+  const ungrouped = showLinks.filter(l => !allCategories.some(c => String(c.id) === String(l.category_id)));
+  if (ungrouped.length > 0) {
+    const section = document.createElement('section');
+    section.className = 'group-section';
+    section.innerHTML = `<h2 class="group-title">未分组</h2><div class="nav-list"></div>`;
+    const navList = section.querySelector('.nav-list');
+    ungrouped.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
       .forEach(link => navList.appendChild(createNavCard(link)));
-    main.appendChild(navList);
-    return;
-  } else {
-    // 没有二级分类，直接显示一级分类下的网站
-    const items = showLinks.filter(l => String(l.category_id) === String(currentCategory));
-    const navList = document.createElement('div');
-    navList.className = 'nav-list';
-    items.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
-      .forEach(link => navList.appendChild(createNavCard(link)));
-    main.appendChild(navList);
-    return;
+    main.appendChild(section);
   }
+}
+
+// 渲染某个分类下的导航项
+function renderLinksForCategory(links, catId, navList) {
+  navList.innerHTML = '';
+  const items = links.filter(l => String(l.category_id) === String(catId));
+  items.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
+    .forEach(link => navList.appendChild(createNavCard(link));
 }
 
 // 搜索时平铺
@@ -189,10 +181,6 @@ function createNavCard(link) {
 // 搜索框监听
 document.getElementById('search').oninput = e => {
   currentSearch = e.target.value.trim();
-  if (currentSearch) {
-    currentCategory = '';
-    currentSubCategory = '';
-  }
   renderCategoryList();
   renderLinks(allLinks);
 };
@@ -266,7 +254,7 @@ function hideTooltip() {
 }
 
 // 可在 style.css 增加如下样式让tab更美观
-/*
+
 .subcat-tabs {
   display: flex;
   gap: 16px;
@@ -287,4 +275,3 @@ function hideTooltip() {
   background: #88af8e;
   color: #fff;
 }
-*/
