@@ -25,16 +25,16 @@ function renderCategoryList() {
   };
   catBox.appendChild(allBtn);
 
-  // 一级分类 (parent_id == null)
-  const level1Cats = allCategories.filter(cat => !cat.parent_id)
+  // 一级分类 (parent_id == null 或 parent_id == undefined)
+  const level1Cats = allCategories.filter(cat => !cat.parent_id && cat.parent_id !== 0)
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
   level1Cats.forEach(cat => {
     const btn = document.createElement('button');
     btn.className = 'category-item';
     btn.textContent = cat.name;
     btn.onclick = function() {
-      // 首页模式不需要切换主内容区，只是左侧高亮
       renderCategoryList();
+      // 首页模式不需要切换主内容区
     };
     catBox.appendChild(btn);
   });
@@ -66,7 +66,7 @@ function renderLinks(links) {
   }
 
   // 按一级分类分组
-  const level1Cats = allCategories.filter(cat => !cat.parent_id)
+  const level1Cats = allCategories.filter(cat => !cat.parent_id && cat.parent_id !== 0)
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
 
   // 每个区块维护自己的“当前二级分类”选中id
@@ -132,12 +132,12 @@ function renderLinks(links) {
   }
 }
 
-// 渲染某个分类下的导航项
+// 渲染某个分类下的导航项（防止类型问题）
 function renderLinksForCategory(links, catId, navList) {
   navList.innerHTML = '';
   const items = links.filter(l => String(l.category_id) === String(catId));
   items.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
-    .forEach(link => navList.appendChild(createNavCard(link));
+    .forEach(link => navList.appendChild(createNavCard(link)));
 }
 
 // 搜索时平铺
@@ -251,27 +251,4 @@ function showTooltip(text, card) {
 function hideTooltip() {
   const tooltip = document.getElementById('nav-tooltip');
   if (tooltip) tooltip.style.display = 'none';
-}
-
-// 可在 style.css 增加如下样式让tab更美观
-
-.subcat-tabs {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 22px;
-}
-.subcat-tab {
-  border: none;
-  background: #f2f2f2;
-  color: #88af8e;
-  border-radius: 8px;
-  padding: 7px 18px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-.subcat-tab.active,
-.subcat-tab:hover {
-  background: #88af8e;
-  color: #fff;
 }

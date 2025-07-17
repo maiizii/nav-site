@@ -542,3 +542,23 @@ footer {
     gap: 12px 0;
   }
 }
+.subcat-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.subcat-tab {
+  border: none;
+  background: #f2f2f2;
+  color: #88af8e;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.subcat-tab.active,
+.subcat-tab:hover {
+  background: #88af8e;
+  color: #fff;
+}
