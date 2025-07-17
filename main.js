@@ -1,5 +1,7 @@
 let allLinks = [];
 let allCategories = [];
+let currentCategory = ''; // 当前选中的一级分类id
+let currentSubCategory = ''; // 当前选中的二级分类id
 let currentSearch = '';
 let tooltipTimer = null;
 
@@ -15,26 +17,32 @@ async function loadCategories() {
 function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
+
   // “全部”按钮
   const allBtn = document.createElement('button');
-  allBtn.className = 'category-item' + (currentSearch === '' ? ' active' : '');
+  allBtn.className = 'category-item' + (currentCategory === '' ? ' active' : '');
   allBtn.textContent = '全部';
   allBtn.onclick = function() {
-    currentSearch = '';
+    currentCategory = '';
+    currentSubCategory = '';
     renderCategoryList();
     renderLinks(allLinks);
   };
   catBox.appendChild(allBtn);
 
-  // 一级分类 (parent_id == null 或 parent_id == undefined)
-  const level1Cats = allCategories.filter(cat => !cat.parent_id && cat.parent_id !== 0)
+  // 一级分类 (parent_id == null)
+  const level1Cats = allCategories.filter(cat => !cat.parent_id)
     .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
   level1Cats.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'category-item';
+    btn.className = 'category-item' + (String(currentCategory) === String(cat.id) ? ' active' : '');
     btn.textContent = cat.name;
     btn.onclick = function() {
-      currentSearch = '__category_' + cat.id;
+      currentCategory = String(cat.id);
+      // 切换一级分类时，自动选中第一个子分类（如果有）
+      const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
+        .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
+      currentSubCategory = subCats.length > 0 ? String(subCats[0].id) : '';
       renderCategoryList();
       renderLinks(allLinks);
     };
@@ -50,87 +58,87 @@ async function loadLinks() {
   renderLinks(allLinks);
 }
 
-// 首页主内容区渲染（全部）
+// 主内容区渲染：只显示当前一级分类
 function renderLinks(links) {
   const main = document.getElementById('main');
   main.innerHTML = '';
   let showLinks = links;
 
-  // 搜索时平铺
-  if (currentSearch && !currentSearch.startsWith('__category_')) {
+  // 搜索优先
+  if (currentSearch) {
     showLinks = links.filter(l =>
       (l.title && l.title.includes(currentSearch)) ||
       (l.description && l.description.includes(currentSearch)) ||
       (l.url && l.url.includes(currentSearch))
     );
+    currentCategory = '';
+    currentSubCategory = '';
     renderSearchLinks(showLinks, main);
     return;
   }
 
-  // 按一级分类分组
-  const level1Cats = allCategories.filter(cat => !cat.parent_id && cat.parent_id !== 0)
-    .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
-
-  // 用于记忆每个区块的二级分类选中状态
-  const subCatSelected = {};
-
-  level1Cats.forEach(cat => {
-    // 二级分类
+  // 当前选中分类区域
+  let cat;
+  if (!currentCategory) {
+    // 默认第一个一级分类
+    const level1Cats = allCategories.filter(cat => !cat.parent_id)
+      .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
+    if (level1Cats.length === 0) return;
+    cat = level1Cats[0];
+    currentCategory = String(cat.id);
+    // 切换一级分类时，自动选中第一个子分类（如果有）
     const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
       .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
+    currentSubCategory = subCats.length > 0 ? String(subCats[0].id) : '';
+  } else {
+    cat = allCategories.find(c => String(c.id) === String(currentCategory));
+    if (!cat) return;
+  }
 
-    // 一级分类区块
-    const section = document.createElement('section');
-    section.className = 'group-section';
+  // 二级分类
+  const subCats = allCategories.filter(c => String(c.parent_id) === String(cat.id))
+    .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
 
-    // 顶部标题+标签栏放一行
-    let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
-    if (subCats.length > 0) {
-      sectionHTML += `<div class="subcat-tabs">`;
-      subCats.forEach((subCat, idx) => {
-        sectionHTML += `<button class="subcat-tab${idx === 0 ? ' active' : ''}" data-subcat-id="${subCat.id}">${subCat.name}</button>`;
-      });
-      sectionHTML += `</div>`;
-      subCatSelected[cat.id] = subCats[0].id;
-    }
+  // 一级分类区块
+  const section = document.createElement('section');
+  section.className = 'group-section';
+
+  // 标题和二级标签同行
+  let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
+  if (subCats.length > 0) {
+    sectionHTML += `<div class="subcat-tabs">`;
+    subCats.forEach((subCat, idx) => {
+      sectionHTML += `<button class="subcat-tab${String(currentSubCategory) === String(subCat.id) ? ' active' : ''}" data-subcat-id="${subCat.id}">${subCat.name}</button>`;
+    });
     sectionHTML += `</div>`;
-    sectionHTML += `<div class="nav-list"></div>`;
-    section.innerHTML = sectionHTML;
-    main.appendChild(section);
+  }
+  sectionHTML += `</div>`;
+  sectionHTML += `<div class="nav-list"></div>`;
+  section.innerHTML = sectionHTML;
+  main.appendChild(section);
 
-    // 内容渲染
-    const navList = section.querySelector('.nav-list');
-    if (subCats.length > 0) {
-      renderLinksForCategory(showLinks, subCatSelected[cat.id], navList);
-      // tab切换事件（只影响该区块的内容）
-      const tabBtns = section.querySelectorAll('.subcat-tab');
-      tabBtns.forEach((tabBtn, idx) => {
-        tabBtn.onclick = function() {
-          tabBtns.forEach(btn => btn.classList.remove('active'));
-          tabBtn.classList.add('active');
-          subCatSelected[cat.id] = subCats[idx].id;
-          renderLinksForCategory(showLinks, subCats[idx].id, navList);
-        };
-      });
-    } else {
-      renderLinksForCategory(showLinks, cat.id, navList);
-    }
-  });
-
-  // 未分组
-  const ungrouped = showLinks.filter(l => !allCategories.some(c => String(c.id) === String(l.category_id)));
-  if (ungrouped.length > 0) {
-    const section = document.createElement('section');
-    section.className = 'group-section';
-    section.innerHTML = `<h2 class="group-title">未分组</h2><div class="nav-list"></div>`;
-    const navList = section.querySelector('.nav-list');
-    ungrouped.sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999))
-      .forEach(link => navList.appendChild(createNavCard(link)));
-    main.appendChild(section);
+  // 内容渲染
+  const navList = section.querySelector('.nav-list');
+  if (subCats.length > 0) {
+    const currentSubCat = subCats.find(c => String(c.id) === String(currentSubCategory)) || subCats[0];
+    renderLinksForCategory(showLinks, currentSubCat.id, navList);
+    // tab切换事件
+    const tabBtns = section.querySelectorAll('.subcat-tab');
+    tabBtns.forEach((tabBtn, idx) => {
+      tabBtn.onclick = function() {
+        tabBtns.forEach(btn => btn.classList.remove('active'));
+        tabBtn.classList.add('active');
+        currentSubCategory = subCats[idx].id;
+        renderLinksForCategory(showLinks, subCats[idx].id, navList);
+      };
+    });
+  } else {
+    // 只显示一级分类下的内容
+    renderLinksForCategory(showLinks, cat.id, navList);
   }
 }
 
-// 渲染某个分类下的导航项（防止类型问题）
+// 渲染某个分类下的导航项
 function renderLinksForCategory(links, catId, navList) {
   navList.innerHTML = '';
   const items = links.filter(l => String(l.category_id) === String(catId));
