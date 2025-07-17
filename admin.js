@@ -92,13 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('adminToken', data.token);
       loginChecked = false;
       hideLoginModal();
-      setTimeout(() => { location.reload(); }, 1200); // 延迟1.2秒
+      setTimeout(() => { location.reload(); }, 1200);
     } else {
       msgEl.textContent = data.msg || '登录失败';
     }
   };
 
-  // 退出登录按钮弹窗
   document.getElementById('adminLogoutBtn').onclick = function () {
     document.getElementById('adminLogoutConfirmModal').style.display = 'flex';
   };
@@ -162,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('adminToken');
         loginChecked = false;
         window.location.reload();
-      }, 1200); // 延迟1.2秒
+      }, 1200);
     } else {
       msgEl.textContent = data.msg || '密码修改失败';
     }
@@ -170,13 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ========== 登录验证 ==========
-// 页面加载时强制登录验证，只弹一次弹窗
 document.addEventListener('DOMContentLoaded', async () => {
   if (!await ensureLogin(3, 500)) return;
   document.getElementById('adminLogoutBtn').style.display = '';
   document.getElementById('adminChangePwdShowBtn').style.display = '';
   window.adminToken = localStorage.getItem('adminToken');
-  // 页面初始化不激活tab，登录后左侧栏可点，但内容不显示，需点击
   document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
 });
@@ -188,10 +185,13 @@ async function fetchCategories() {
   allCategories = json.data || [];
   allCategories.sort((a, b) => (a.sort || 0) - (b.sort || 0));
 
+  // 构建分组/树形下拉
   const catFilter = document.getElementById('nav-category-filter');
   if (catFilter) {
     catFilter.innerHTML = `<option value="">全部</option>` +
-      allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      allCategories.map(c =>
+        `<option value="${c.id}">${c.parent_id ? '— ' : ''}${c.name}</option>`
+      ).join('');
     catFilter.value = currentNavCategoryFilter;
   }
 }
@@ -212,6 +212,7 @@ function renderCategoryTable(list) {
         <tr>
           <th style="width:48px;">排序</th>
           <th>分类名称</th>
+          <th>父分类</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -220,6 +221,12 @@ function renderCategoryTable(list) {
         <tr>
           <td></td>
           <td><input type="text" id="add-cat-name" placeholder="分类名称" required /></td>
+          <td>
+            <select id="add-cat-parent">
+              <option value="">无</option>
+              ${list.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+            </select>
+          </td>
           <td>
             <button id="add-cat-btn">新增</button>
           </td>
@@ -237,6 +244,14 @@ function renderCategoryTable(list) {
         ${cat.sort || ""}
       </td>
       <td><input type="text" value="${cat.name}" id="name-${cat.id}" /></td>
+      <td>
+        <select id="parent-${cat.id}">
+          <option value="">无</option>
+          ${list.filter(c => c.id !== cat.id).map(c =>
+            `<option value="${c.id}"${cat.parent_id === c.id ? " selected" : ""}>${c.name}</option>`
+          ).join('')}
+        </select>
+      </td>
       <td>
         <button class="save-cat-btn" data-id="${cat.id}">保存</button>
         <button class="del-cat-btn danger" data-id="${cat.id}">删除</button>
@@ -267,7 +282,8 @@ function renderCategoryTable(list) {
       const id = btn.getAttribute('data-id');
       const payload = {
         id,
-        name: document.getElementById(`name-${id}`).value
+        name: document.getElementById(`name-${id}`).value,
+        parent_id: document.getElementById(`parent-${id}`).value || null
       };
       await fetchWithAuth(CAT_SAVE_API, {
         method: 'POST',
@@ -293,11 +309,12 @@ function renderCategoryTable(list) {
 
   document.getElementById('add-cat-btn').onclick = async () => {
     const name = document.getElementById('add-cat-name').value;
+    const parent_id = document.getElementById('add-cat-parent').value || null;
     if (!name.trim()) return;
     await fetchWithAuth(CAT_ADD_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ name, parent_id })
     });
     document.getElementById('add-cat-name').value = '';
     loadCategories();
@@ -314,7 +331,7 @@ async function loadNavLinks() {
   const json = await res.json();
   let links = json.data || [];
   if (currentNavCategoryFilter) {
-    links = links.filter(link => link.category === currentNavCategoryFilter);
+    links = links.filter(link => String(link.category_id) === String(currentNavCategoryFilter));
   }
   renderNavTable(links);
 }
@@ -352,7 +369,9 @@ function renderNavTable(list) {
           <td><input type="url" id="add-url" placeholder="链接" required /></td>
           <td>
             <select id="add-category">
-              ${allCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+              ${allCategories.map(c =>
+                `<option value="${c.id}">${c.parent_id ? '— ' : ''}${c.name}</option>`
+              ).join('')}
             </select>
           </td>
           <td><input type="text" id="add-description" placeholder="描述" /></td>
@@ -377,7 +396,9 @@ function renderNavTable(list) {
       <td><input type="url" value="${nav.url}" id="url-${nav.id}" /></td>
       <td>
         <select id="category-${nav.id}">
-          ${allCategories.map(c => `<option value="${c.name}"${nav.category === c.name ? " selected" : ""}>${c.name}</option>`).join('')}
+          ${allCategories.map(c =>
+            `<option value="${c.id}"${nav.category_id === c.id ? " selected" : ""}>${c.parent_id ? '— ' : ''}${c.name}</option>`
+          ).join('')}
         </select>
       </td>
       <td><input type="text" value="${nav.description || ''}" id="desc-${nav.id}" /></td>
@@ -414,7 +435,7 @@ function renderNavTable(list) {
         id,
         title: document.getElementById(`title-${id}`).value,
         url: document.getElementById(`url-${id}`).value,
-        category: document.getElementById(`category-${id}`).value,
+        category_id: document.getElementById(`category-${id}`).value,
         description: document.getElementById(`desc-${id}`).value,
         icon: document.getElementById(`icon-${id}`).value
       };
@@ -449,7 +470,7 @@ function renderNavTable(list) {
     const payload = {
       title: document.getElementById('add-title').value,
       url: document.getElementById('add-url').value,
-      category: document.getElementById('add-category').value,
+      category_id: document.getElementById('add-category').value,
       description: document.getElementById('add-description').value,
       icon: document.getElementById('add-icon').value
     };
@@ -460,7 +481,7 @@ function renderNavTable(list) {
     });
     document.getElementById('add-title').value = '';
     document.getElementById('add-url').value = '';
-    document.getElementById('add-category').value = allCategories.length ? allCategories[0].name : '';
+    document.getElementById('add-category').value = allCategories.length ? allCategories[0].id : '';
     document.getElementById('add-description').value = '';
     document.getElementById('add-icon').value = '';
     loadNavLinks();
