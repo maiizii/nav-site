@@ -1,3 +1,9 @@
+/* 只在PC端显示主导航 */
+@media (max-width: 900px) {
+  .pc-only {
+    display: none !important;
+  }
+}
 :root {
   --color-main: #222;
   --color-sub: #fff;
