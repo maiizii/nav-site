@@ -62,6 +62,7 @@ async function signJWT(header, payload, secret) {
     key,
     new TextEncoder().encode(header + "." + payload)
   );
+  // 正确的 base64url 编码
   const b64 = btoa(String.fromCharCode(...new Uint8Array(signature)));
   return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
