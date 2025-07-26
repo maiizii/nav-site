@@ -254,7 +254,7 @@ function renderCategoryTable(list) {
           <td>
             <select id="add-cat-parent">
               <option value="">无</option>
-              ${list.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+              ${list.filter(c => !c.parent_id).map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
             </select>
           </td>
           <td>
@@ -277,7 +277,7 @@ function renderCategoryTable(list) {
       <td>
         <select id="parent-${cat.id}">
           <option value="">无</option>
-          ${list.filter(c => c.id !== cat.id).map(c =>
+          ${list.filter(c => c.id !== cat.id && !c.parent_id).map(c =>
             `<option value="${c.id}"${cat.parent_id === c.id ? " selected" : ""}>${c.name}</option>`
           ).join('')}
         </select>
@@ -360,6 +360,9 @@ async function loadNavLinks() {
   }
   const json = await res.json();
   let links = json.data || [];
+  
+  // 按排序字段排序
+  links.sort((a, b) => (a.sort || 9999) - (b.sort || 9999));
 
   // 筛选
   if (currentNavSubCategoryFilter) {
@@ -485,20 +488,24 @@ function renderNavTable(list) {
   tbody.querySelectorAll('.save-btn').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
+      const tr = btn.closest('tr');
+      const currentPosition = Array.from(tr.parentNode.children).indexOf(tr);
+      
       const payload = {
         id,
         title: document.getElementById(`title-${id}`).value,
         url: document.getElementById(`url-${id}`).value,
         category_id: document.getElementById(`category-${id}`).value,
         description: document.getElementById(`desc-${id}`).value,
-        icon: document.getElementById(`icon-${id}`).value
+        icon: document.getElementById(`icon-${id}`).value,
+        sort: currentPosition + 1 // 保持当前位置的排序
       };
       await fetchWithAuth(SAVE_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      loadNavLinks();
+      // 不重新加载整个列表，保持位置
     };
   });
 
@@ -523,12 +530,17 @@ function renderNavTable(list) {
   }
 
   document.getElementById('add-btn').onclick = async () => {
+    // 获取当前列表的最大排序值
+    const currentItems = document.querySelectorAll('#nav-tbody tr');
+    const maxSort = currentItems.length > 0 ? currentItems.length : 0;
+    
     const payload = {
       title: document.getElementById('add-title').value,
       url: document.getElementById('add-url').value,
       category_id: document.getElementById('add-category').value,
       description: document.getElementById('add-description').value,
-      icon: document.getElementById('add-icon').value
+      icon: document.getElementById('add-icon').value,
+      sort: maxSort + 1 // 排在最下面
     };
     await fetchWithAuth(ADD_API, {
       method: 'POST',
@@ -540,7 +552,7 @@ function renderNavTable(list) {
     document.getElementById('add-category').value = allCategories.length ? allCategories[0].id : '';
     document.getElementById('add-description').value = '';
     document.getElementById('add-icon').value = '';
-    loadNavLinks();
+    loadNavLinks(); // 新增后需要重新加载以显示新项目
   };
 }
 
