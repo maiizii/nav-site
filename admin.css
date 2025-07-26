@@ -306,6 +306,8 @@ body {
 .admin-login-box h2 { color: var(--color-accent); text-align: center; margin-bottom: 14px; }
 .admin-login-box input { width: 92%; margin-bottom: 13px; padding: 10px 13px; border-radius: 7px; border: 1px solid #ddd; font-size: 16px; box-sizing: border-box; }
 .admin-login-box button { width: 96%; background: var(--color-accent); color: #fff; font-size: 16px; border: none; border-radius: 7px; padding: 11px 0; cursor: pointer; }
+.admin-login-box button + button { width: 45%; margin-left: 6%; margin-top: 0; }
+.admin-login-box button:first-of-type { width: 45%; }
 .admin-login-msg { color: var(--color-danger); text-align: center; margin-bottom: 10px; font-size: 15px; }
 footer {
   text-align: center;
