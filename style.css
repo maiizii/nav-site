@@ -1,3 +1,124 @@
+/* 移动端顶部分类菜单和弹窗样式 */
+@media (max-width: 600px) {
+  .sidebar {
+    display: none !important;
+  }
+  .mobile-category-btn {
+    display: block !important;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: #fff;
+    border: 1px solid #88af8e;
+    border-radius: 8px;
+    font-size: 24px;
+    color: #88af8e;
+    width: 38px;
+    height: 38px;
+    z-index: 100;
+    cursor: pointer;
+  }
+  .mobile-category-menu {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255,255,255,0.98);
+    z-index: 9999;
+    box-shadow: 0 2px 18px rgba(136,175,142,0.13);
+    padding: 0;
+    animation: fadeIn 0.2s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .mobile-category-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 8px 18px;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
+    color: #88af8e;
+    font-weight: bold;
+  }
+  #mobile-category-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #888;
+    cursor: pointer;
+    padding: 0 8px;
+  }
+  .mobile-category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 18px;
+    justify-content: flex-start;
+  }
+  .mobile-category-list .category-item {
+    background: #f2f2f2;
+    color: #88af8e;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    min-width: 80px;
+    height: 38px;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0 10px;
+    text-align: center;
+  }
+  .mobile-category-list .category-item.active,
+  .mobile-category-list .category-item:hover {
+    background: #88af8e;
+    color: #fff;
+  }
+  /* 二级分类每行3个 */
+  .subcat-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-left: 0;
+  }
+  .subcat-tab {
+    font-size: 12px;
+    padding: 6px 4px;
+    min-width: 0;
+    max-width: none;
+    text-align: center;
+    border-radius: 7px;
+  }
+  /* 网址名片更窄更小 */
+  .nav-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 2px;
+  }
+  .nav-card {
+    width: 98%;
+    min-width: 0;
+    max-width: 140px;
+    margin: 0 auto;
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  .nav-title {
+    font-size: 0.92em;
+  }
+  .nav-desc {
+    font-size: 0.88em;
+  }
+}
 /* 移动端分类栏横向滚动，二级分类和名片布局优化 */
 @media (max-width: 600px) {
   .sidebar {
