@@ -52,11 +52,11 @@
     padding: 0 6px;
   }
   .mobile-category-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
     padding: 12px;
-    justify-content: flex-start;
+    max-width: 100%;
   }
   .mobile-category-list .category-item {
     background: #f2f2f2;
@@ -64,8 +64,7 @@
     border-radius: 6px;
     border: none;
     font-size: 12px;
-    min-width: 60px;
-    height: 30px;
+    height: 36px;
     outline: none;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
@@ -73,8 +72,11 @@
     align-items: center;
     justify-content: center;
     margin: 0;
-    padding: 0 6px;
+    padding: 0 4px;
     text-align: center;
+    word-break: break-all;
+    white-space: nowrap;
+    overflow: hidden;
   }
   .mobile-category-list .category-item.active,
   .mobile-category-list .category-item:hover {
@@ -100,15 +102,17 @@
   /* 网址名片缩小为2列，稍微放大 */
   .nav-list {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px 4px !important;
+    gap: 8px 6px !important;
+    padding: 0 4px !important;
   }
   .nav-card {
-    width: 98% !important;
+    width: 100% !important;
     min-width: 0 !important;
-    max-width: 160px !important;
-    margin: 0 auto !important;
-    padding: 8px 4px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 8px 6px !important;
     font-size: 13px !important;
+    box-sizing: border-box !important;
   }
   .nav-title {
     font-size: 0.95em !important;
