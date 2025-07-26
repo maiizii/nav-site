@@ -10,6 +10,10 @@
 <body>
   <header class="tk-header">
     <div class="tk-header-inner">
+      <!-- 移动端分类菜单按钮 -->
+      <button class="mobile-category-btn" id="mobile-category-btn" aria-label="分类菜单" type="button" style="display:none;">
+        &#9776;
+      </button>
       <div class="tk-logo">
         <a href="https://www.tkcall.com" class="logo-link">
           <img class="logo-img" src="/tkcall_logo.png" alt="logo" />
@@ -38,6 +42,14 @@
       <nav id="category-list" class="category-list"></nav>
       <button class="sidebar-top-btn" id="sidebar-top-btn" type="button">TOP</button>
     </aside>
+    <!-- 移动端分类弹窗菜单 -->
+    <div class="mobile-category-menu" id="mobile-category-menu" style="display:none;">
+      <div class="mobile-category-menu-header">
+        <span>分类</span>
+        <button id="mobile-category-close" aria-label="关闭分类菜单" type="button">×</button>
+      </div>
+      <nav id="mobile-category-list" class="mobile-category-list"></nav>
+    </div>
     <section class="main-content" id="main"></section>
   </main>
   <footer>
