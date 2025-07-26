@@ -35,6 +35,28 @@ document.addEventListener('DOMContentLoaded', function() {
       // 同步分类内容
       if (list && mobileList) {
         mobileList.innerHTML = list.innerHTML;
+        // 为移动端分类项绑定事件
+        const mobileItems = mobileList.querySelectorAll('.category-item');
+        mobileItems.forEach(item => {
+          item.addEventListener('click', function() {
+            const categoryId = this.dataset.categoryId;
+            // 直接执行分类切换逻辑
+            if (categoryId === '' || categoryId === undefined) {
+              currentCategory = '';
+              currentSubCategory = '';
+            } else {
+              currentCategory = String(categoryId);
+              // 切换一级分类时，自动选中第一个子分类（如果有）
+              const subCats = allCategories.filter(c => String(c.parent_id) === String(categoryId))
+                .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
+              currentSubCategory = subCats.length > 0 ? String(subCats[0].id) : '';
+            }
+            renderCategoryList();
+            renderLinks(allLinks);
+            // 关闭移动端菜单
+            menu.style.display = 'none';
+          });
+        });
       }
     });
   }
@@ -71,10 +93,11 @@ function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
 
-  // “全部”按钮
+    // "全部"按钮
   const allBtn = document.createElement('button');
   allBtn.className = 'category-item' + (currentCategory === '' ? ' active' : '');
   allBtn.textContent = '全部';
+  allBtn.dataset.categoryId = '';
   allBtn.onclick = function() {
     currentCategory = '';
     currentSubCategory = '';
@@ -90,6 +113,7 @@ function renderCategoryList() {
     const btn = document.createElement('button');
     btn.className = 'category-item' + (String(currentCategory) === String(cat.id) ? ' active' : '');
     btn.textContent = cat.name;
+    btn.dataset.categoryId = cat.id;
     btn.onclick = function() {
       currentCategory = String(cat.id);
       // 切换一级分类时，自动选中第一个子分类（如果有）
