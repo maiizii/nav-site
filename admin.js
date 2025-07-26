@@ -254,7 +254,7 @@ function renderCategoryTable(list) {
           <td>
             <select id="add-cat-parent">
               <option value="">无</option>
-              ${list.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+              ${list.filter(c => !c.parent_id).map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
             </select>
           </td>
           <td>
@@ -277,7 +277,7 @@ function renderCategoryTable(list) {
       <td>
         <select id="parent-${cat.id}">
           <option value="">无</option>
-          ${list.filter(c => c.id !== cat.id).map(c =>
+          ${list.filter(c => c.id !== cat.id && !c.parent_id).map(c =>
             `<option value="${c.id}"${cat.parent_id === c.id ? " selected" : ""}>${c.name}</option>`
           ).join('')}
         </select>
@@ -360,6 +360,9 @@ async function loadNavLinks() {
   }
   const json = await res.json();
   let links = json.data || [];
+  
+  // 按排序字段排序
+  links.sort((a, b) => (a.sort || 9999) - (b.sort || 9999));
 
   // 筛选
   if (currentNavSubCategoryFilter) {
@@ -485,20 +488,24 @@ function renderNavTable(list) {
   tbody.querySelectorAll('.save-btn').forEach(btn => {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
+      const tr = btn.closest('tr');
+      const currentPosition = Array.from(tr.parentNode.children).indexOf(tr);
+      
       const payload = {
         id,
         title: document.getElementById(`title-${id}`).value,
         url: document.getElementById(`url-${id}`).value,
         category_id: document.getElementById(`category-${id}`).value,
         description: document.getElementById(`desc-${id}`).value,
-        icon: document.getElementById(`icon-${id}`).value
+        icon: document.getElementById(`icon-${id}`).value,
+        sort: currentPosition + 1 // 保持当前位置的排序
       };
       await fetchWithAuth(SAVE_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      loadNavLinks();
+      // 不重新加载整个列表，保持位置
     };
   });
 
@@ -523,24 +530,49 @@ function renderNavTable(list) {
   }
 
   document.getElementById('add-btn').onclick = async () => {
+    // 验证必填字段
+    const title = document.getElementById('add-title').value.trim();
+    const url = document.getElementById('add-url').value.trim();
+    if (!title || !url) {
+      alert('请填写网站名称和链接');
+      return;
+    }
+    
+    // 获取当前所有数据的最大排序值
+    const res = await fetchWithAuth(API);
+    const json = await res.json();
+    const allLinks = json.data || [];
+    const maxSort = allLinks.length > 0 ? Math.max(...allLinks.map(link => link.sort || 0)) : 0;
+    
     const payload = {
-      title: document.getElementById('add-title').value,
-      url: document.getElementById('add-url').value,
+      title: title,
+      url: url,
       category_id: document.getElementById('add-category').value,
-      description: document.getElementById('add-description').value,
-      icon: document.getElementById('add-icon').value
+      description: document.getElementById('add-description').value.trim(),
+      icon: document.getElementById('add-icon').value.trim(),
+      sort: maxSort + 1 // 排在最下面
     };
-    await fetchWithAuth(ADD_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    document.getElementById('add-title').value = '';
-    document.getElementById('add-url').value = '';
-    document.getElementById('add-category').value = allCategories.length ? allCategories[0].id : '';
-    document.getElementById('add-description').value = '';
-    document.getElementById('add-icon').value = '';
-    loadNavLinks();
+    
+    try {
+      await fetchWithAuth(ADD_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      // 清空表单
+      document.getElementById('add-title').value = '';
+      document.getElementById('add-url').value = '';
+      document.getElementById('add-category').value = allCategories.length ? allCategories[0].id : '';
+      document.getElementById('add-description').value = '';
+      document.getElementById('add-icon').value = '';
+      
+      // 重新加载列表
+      loadNavLinks();
+    } catch (error) {
+      console.error('新增失败:', error);
+      alert('新增失败，请重试');
+    }
   };
 }
 
