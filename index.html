@@ -11,12 +11,16 @@
   <header class="tk-header">
     <div class="tk-header-inner">
       <div class="tk-logo">
-        <a href="https://www.tkcall.com" class="logo-link">
+        <a href="https://www.tkcall.com" style="text-decoration:none;">
           <img class="logo-img" src="/tkcall_logo.png" alt="logo" />
         </a>
-        <span class="site-nav-title">网站导航</span>
+        <a class="site-nav-title" href="/" style="text-decoration:none;">网站导航</a>
       </div>
-      <nav class="tk-menu pc-only" aria-label="主导航">
+      <!-- 移动端分类菜单按钮 -->
+      <button class="mobile-category-btn" id="mobile-category-btn" aria-label="分类菜单" type="button">
+        &#9776;
+      </button>
+      <nav class="tk-menu pc-only">
         <a class="tk-menu-link" href="https://www.tkcall.com/c/general/4">日常</a>
         <a class="tk-menu-link" href="https://www.tkcall.com/c/operation/6">运营</a>
         <a class="tk-menu-link" href="https://www.tkcall.com/c/technology/7">技术</a>
@@ -25,23 +29,31 @@
         <a class="tk-menu-link" href="https://www.tkcall.com/c/trade/8">交易</a>
       </nav>
       <div class="header-actions">
-        <form class="search-bar" role="search" aria-label="站内搜索" onsubmit="return false;">
-          <input id="search" type="text" placeholder="搜索..." autocomplete="off" />
-        </form>
-        <a href="admin" class="header-btn" id="settings-btn">设置</a>
+        <div class="search-bar">
+          <input id="search" type="text" placeholder="搜索..." />
+        </div>
+        <a href="https://www.tkcall.com/t/topic/210" class="header-btn" id="settings-btn" style="margin-left:auto;">网站推荐</a>
       </div>
     </div>
   </header>
-  <main class="container">
-    <aside class="sidebar" aria-label="分类导航">
+  <div class="container">
+    <aside class="sidebar">
       <div class="sidebar-categories-label">分类</div>
-      <nav id="category-list" class="category-list"></nav>
-      <button class="sidebar-top-btn" id="sidebar-top-btn" type="button">TOP</button>
+      <div id="category-list" class="category-list"></div>
+      <button class="sidebar-top-btn" id="sidebar-top-btn">TOP</button>
     </aside>
+    <!-- 移动端分类弹窗菜单 -->
+    <div class="mobile-category-menu" id="mobile-category-menu">
+      <div class="mobile-category-menu-header">
+        <span>分类</span>
+        <button id="mobile-category-close" aria-label="关闭分类菜单" type="button">×</button>
+      </div>
+      <nav id="mobile-category-list" class="mobile-category-list"></nav>
+    </div>
     <section class="main-content" id="main"></section>
-  </main>
+  </div>
   <footer>
-    <p>© 2025 TK客网站导航</p>
+    <p style="color:#999;">© 2025 TK客网站导航</p>
   </footer>
   <script src="./main.js"></script>
 </body>
