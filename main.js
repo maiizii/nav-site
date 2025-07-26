@@ -17,6 +17,15 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   updateMenuBtnDisplay();
   window.addEventListener('resize', updateMenuBtnDisplay);
+  
+  // 窗口大小改变时重新渲染内容（用于切换分类名称换行效果）
+  let resizeTimer = null;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      renderContent(allLinks);
+    }, 150);
+  });
 
   // 打开菜单
   btn.addEventListener('click', function() {
@@ -128,8 +137,16 @@ function renderLinks(links) {
       const section = document.createElement('section');
       section.className = 'group-section';
 
+      // 移动端处理分类名称换行
+      let categoryName = cat.name;
+      if (window.innerWidth <= 600 && categoryName.length >= 3) {
+        // 将4字分类名从中间拆分，如"视频工具"变成"视频\n工具"
+        const mid = Math.ceil(categoryName.length / 2);
+        categoryName = categoryName.substring(0, mid) + '\n' + categoryName.substring(mid);
+      }
+
       // 标题和二级标签同行
-      let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
+      let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${categoryName}</h2>`;
       if (subCats.length > 0) {
         sectionHTML += `<div class="subcat-tabs">`;
         subCats.forEach((subCat, idx) => {
@@ -191,8 +208,16 @@ function renderLinks(links) {
   const section = document.createElement('section');
   section.className = 'group-section';
 
+  // 移动端处理分类名称换行
+  let categoryName = cat.name;
+  if (window.innerWidth <= 600 && categoryName.length >= 3) {
+    // 将4字分类名从中间拆分，如"视频工具"变成"视频\n工具"
+    const mid = Math.ceil(categoryName.length / 2);
+    categoryName = categoryName.substring(0, mid) + '\n' + categoryName.substring(mid);
+  }
+
   // 标题和二级标签同行
-  let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
+  let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${categoryName}</h2>`;
   if (subCats.length > 0) {
     sectionHTML += `<div class="subcat-tabs">`;
     subCats.forEach((subCat, idx) => {
