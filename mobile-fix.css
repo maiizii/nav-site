@@ -1,0 +1,40 @@
+/* 强制覆盖移动端分类菜单样式 */
+@media (max-width: 600px) {
+  .mobile-category-list {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1px !important;
+    padding: 16px 4px !important;
+    max-width: 100% !important;
+  }
+  
+  .mobile-category-list .category-item {
+    background: #f2f2f2 !important;
+    color: #88af8e !important;
+    border-radius: 6px !important;
+    border: none !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    height: 42px !important;
+    outline: none !important;
+    cursor: pointer !important;
+    transition: background 0.15s, color 0.15s !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 2px !important;
+    text-align: center !important;
+    word-break: break-all !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  
+  .mobile-category-list .category-item.active,
+  .mobile-category-list .category-item:hover {
+    background: #88af8e !important;
+    color: #fff !important;
+  }
+}
