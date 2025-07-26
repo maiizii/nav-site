@@ -1,3 +1,78 @@
+// 移动端分类菜单交互
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('mobile-category-btn');
+  var menu = document.getElementById('mobile-category-menu');
+  var closeBtn = document.getElementById('mobile-category-close');
+  var list = document.getElementById('category-list');
+  var mobileList = document.getElementById('mobile-category-list');
+
+  // 仅在移动端显示按钮
+  function updateMenuBtnDisplay() {
+    if (!btn) return; // 如果按钮不存在则返回
+    if (window.innerWidth <= 600) {
+      btn.style.display = 'block';
+    } else {
+      btn.style.display = 'none';
+      if (menu) menu.style.display = 'none';
+    }
+  }
+  updateMenuBtnDisplay();
+  window.addEventListener('resize', updateMenuBtnDisplay);
+  
+  // 窗口大小改变时重新渲染内容（用于切换分类名称换行效果）
+  let resizeTimer = null;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      renderContent(allLinks);
+    }, 150);
+  });
+
+  // 打开菜单
+  if (btn && menu) {
+    btn.addEventListener('click', function() {
+      menu.style.display = 'block';
+      // 同步分类内容
+      if (list && mobileList) {
+        mobileList.innerHTML = list.innerHTML;
+        // 为移动端分类项绑定事件
+        const mobileItems = mobileList.querySelectorAll('.category-item');
+        mobileItems.forEach(item => {
+          item.addEventListener('click', function() {
+            const categoryId = this.dataset.categoryId;
+            // 直接执行分类切换逻辑
+            if (categoryId === '' || categoryId === undefined) {
+              currentCategory = '';
+              currentSubCategory = '';
+            } else {
+              currentCategory = String(categoryId);
+              // 切换一级分类时，自动选中第一个子分类（如果有）
+              const subCats = allCategories.filter(c => String(c.parent_id) === String(categoryId))
+                .sort((a, b) => (a.sort ?? 9999) - (b.sort ?? 9999));
+              currentSubCategory = subCats.length > 0 ? String(subCats[0].id) : '';
+            }
+            renderCategoryList();
+            renderLinks(allLinks);
+            // 关闭移动端菜单
+            menu.style.display = 'none';
+          });
+        });
+      }
+    });
+  }
+  // 关闭菜单
+  if (closeBtn && menu) {
+    closeBtn.addEventListener('click', function() {
+      menu.style.display = 'none';
+    });
+  }
+  // 点击菜单外部关闭
+  if (menu) {
+    menu.addEventListener('click', function(e) {
+      if (e.target === menu) menu.style.display = 'none';
+    });
+  }
+});
 let allLinks = [];
 let allCategories = [];
 let currentCategory = ''; // 当前选中的一级分类id
@@ -18,10 +93,11 @@ function renderCategoryList() {
   const catBox = document.getElementById('category-list');
   catBox.innerHTML = '';
 
-  // “全部”按钮
+    // "全部"按钮
   const allBtn = document.createElement('button');
   allBtn.className = 'category-item' + (currentCategory === '' ? ' active' : '');
   allBtn.textContent = '全部';
+  allBtn.dataset.categoryId = '';
   allBtn.onclick = function() {
     currentCategory = '';
     currentSubCategory = '';
@@ -37,6 +113,7 @@ function renderCategoryList() {
     const btn = document.createElement('button');
     btn.className = 'category-item' + (String(currentCategory) === String(cat.id) ? ' active' : '');
     btn.textContent = cat.name;
+    btn.dataset.categoryId = cat.id;
     btn.onclick = function() {
       currentCategory = String(cat.id);
       // 切换一级分类时，自动选中第一个子分类（如果有）
@@ -91,8 +168,16 @@ function renderLinks(links) {
       const section = document.createElement('section');
       section.className = 'group-section';
 
+      // 移动端处理分类名称换行
+      let categoryName = cat.name;
+      if (window.innerWidth <= 600 && categoryName.length >= 3) {
+        // 将4字分类名从中间拆分，如"视频工具"变成"视频\n工具"
+        const mid = Math.ceil(categoryName.length / 2);
+        categoryName = categoryName.substring(0, mid) + '\n' + categoryName.substring(mid);
+      }
+
       // 标题和二级标签同行
-      let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
+      let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${categoryName}</h2>`;
       if (subCats.length > 0) {
         sectionHTML += `<div class="subcat-tabs">`;
         subCats.forEach((subCat, idx) => {
@@ -154,8 +239,16 @@ function renderLinks(links) {
   const section = document.createElement('section');
   section.className = 'group-section';
 
+  // 移动端处理分类名称换行
+  let categoryName = cat.name;
+  if (window.innerWidth <= 600 && categoryName.length >= 3) {
+    // 将4字分类名从中间拆分，如"视频工具"变成"视频\n工具"
+    const mid = Math.ceil(categoryName.length / 2);
+    categoryName = categoryName.substring(0, mid) + '\n' + categoryName.substring(mid);
+  }
+
   // 标题和二级标签同行
-  let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${cat.name}</h2>`;
+  let sectionHTML = `<div class="group-title-bar"><h2 class="group-title">${categoryName}</h2>`;
   if (subCats.length > 0) {
     sectionHTML += `<div class="subcat-tabs">`;
     subCats.forEach((subCat, idx) => {
