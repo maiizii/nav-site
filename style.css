@@ -711,10 +711,9 @@ footer {
     gap: 8px;
   }
   .tk-menu-link { font-size: 14px; }
+  /* 隐藏侧边栏分类，改用右上角三横菜单 */
   .sidebar {
-    padding: 8px 0;
-    gap: 4px;
-    top: 60px;
+    display: none !important;
   }
   .main-content {
     padding: 12px 2px;
@@ -722,5 +721,12 @@ footer {
   .nav-list {
     grid-template-columns: 1fr;
     gap: 12px 0;
+  }
+  /* 一级分类名称换行显示 */
+  .group-title {
+    font-size: 1em;
+    line-height: 1.2;
+    word-break: break-all;
+    white-space: pre-line;
   }
 }
