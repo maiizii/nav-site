@@ -257,6 +257,26 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'admin';
     };
   }
+
+  // 菜单收起/展开逻辑
+  const menuToggleBtn = document.getElementById('menu-toggle-btn');
+  const tkMenu = document.getElementById('tk-menu');
+  if (menuToggleBtn && tkMenu) {
+    menuToggleBtn.onclick = function(e) {
+      e.stopPropagation();
+      tkMenu.classList.toggle('menu-open');
+    };
+    // 点击页面其他地方收起菜单
+    document.body.addEventListener('click', function(e) {
+      if (
+        tkMenu.classList.contains('menu-open') &&
+        !tkMenu.contains(e.target) &&
+        e.target !== menuToggleBtn
+      ) {
+        tkMenu.classList.remove('menu-open');
+      }
+    });
+  }
 });
 
 async function initPage() {
