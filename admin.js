@@ -139,6 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  document.getElementById('adminLoginCancelBtn').onclick = function () {
+    // 返回上一个页面
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // 如果没有历史记录，返回首页
+      window.location.href = '/';
+    }
+  };
+
   document.getElementById('adminLogoutBtn').onclick = function () {
     document.getElementById('adminLogoutConfirmModal').style.display = 'flex';
   };
