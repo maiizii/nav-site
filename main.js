@@ -35,16 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
       // 同步分类内容
       if (list && mobileList) {
         mobileList.innerHTML = list.innerHTML;
-        
-        // 强制设置移动端分类列表样式
-        mobileList.style.cssText = 'display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 1px !important; padding: 16px 4px !important; max-width: 100% !important;';
-        
-        // 为移动端分类项绑定事件并设置样式
+        // 为移动端分类项绑定事件
         const mobileItems = mobileList.querySelectorAll('.category-item');
         mobileItems.forEach(item => {
-          // 强制设置每个分类项的样式
-          item.style.cssText = 'background: #f2f2f2 !important; color: #88af8e !important; border-radius: 6px !important; border: none !important; font-size: 14px !important; font-weight: bold !important; height: 42px !important; outline: none !important; cursor: pointer !important; transition: background 0.15s, color 0.15s !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; padding: 0 2px !important; text-align: center !important; word-break: break-all !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; width: 100% !important;';
-          
           item.addEventListener('click', function() {
             const categoryId = this.dataset.categoryId;
             // 直接执行分类切换逻辑
