@@ -63,7 +63,8 @@
     color: #88af8e;
     border-radius: 6px;
     border: none;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: bold;
     height: 36px;
     outline: none;
     cursor: pointer;
