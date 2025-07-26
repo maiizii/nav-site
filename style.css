@@ -75,6 +75,27 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* 菜单折叠按钮 */
+.menu-toggle {
+  display: none;
+  background: #88af8e;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 1.8em;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  margin-right: 8px;
+  align-self: flex-end;
+  z-index: 50;
+}
+
+.tk-menu-wrapper {
+  width: auto;
+  position: relative;
+}
+
 .tk-menu {
   display: flex;
   align-items: center;
@@ -587,7 +608,57 @@ footer {
     padding: 10px 8px;
     gap: 8px;
   }
-  .tk-menu-link { font-size: 14px; }
+  .menu-toggle {
+    display: block;
+  }
+  .tk-menu-wrapper {
+    width: 100%;
+    position: relative;
+  }
+  .tk-menu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 45px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    z-index: 40;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 8px 28px 0 rgba(60,62,68,0.18), 0 1.5px 14px rgba(60,62,68,0.13);
+    padding: 10px 0;
+  }
+  .tk-menu.menu-open {
+    display: flex;
+  }
+  .tk-menu-link {
+    height: 38px;
+    line-height: 38px;
+    font-size: 1.1em;
+    border-radius: 7px;
+    padding: 0 14px;
+    margin: 6px 0;
+  }
+  .search-bar {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    margin-left: 0;
+    margin-top: 8px;
+    padding: 0 4px;
+  }
+  .search-bar input {
+    font-size: 1em;
+    padding: 10px 13px;
+    border-radius: 10px;
+  }
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 0;
+    width: 100%;
+    gap: 8px;
+  }
   .sidebar {
     padding: 8px 0;
     gap: 4px;
