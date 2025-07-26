@@ -24,6 +24,8 @@ export async function onRequestPost(context) {
 // 直接复用你已写的 verifyJWT 方法
 async function verifyJWT(token, secret) {
   const [headerB64, payloadB64, signatureB64] = token.split('.');
+  if (!headerB64 || !payloadB64 || !signatureB64) return null;
+  
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
@@ -31,14 +33,31 @@ async function verifyJWT(token, secret) {
     false,
     ["sign", "verify"]
   );
-  const valid = await crypto.subtle.verify(
-    "HMAC",
-    key,
-    Uint8Array.from(atob(signatureB64), c => c.charCodeAt(0)),
-    new TextEncoder().encode(headerB64 + "." + payloadB64)
-  );
-  if (!valid) return null;
-  const payload = JSON.parse(atob(payloadB64));
-  if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
-  return payload;
+  
+  // 修复base64url解码
+  const fixedSignature = signatureB64.replace(/-/g, '+').replace(/_/g, '/');
+  const padding = '='.repeat((4 - fixedSignature.length % 4) % 4);
+  const signature = fixedSignature + padding;
+  
+  try {
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      Uint8Array.from(atob(signature), c => c.charCodeAt(0)),
+      new TextEncoder().encode(headerB64 + "." + payloadB64)
+    );
+    if (!valid) return null;
+    
+    // 修复base64url解码
+    const fixedPayload = payloadB64.replace(/-/g, '+').replace(/_/g, '/');
+    const payloadPadding = '='.repeat((4 - fixedPayload.length % 4) % 4);
+    const payloadDecoded = fixedPayload + payloadPadding;
+    
+    const payload = JSON.parse(atob(payloadDecoded));
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch (e) {
+    console.error('[verifyJWT] 解码错误:', e);
+    return null;
+  }
 }

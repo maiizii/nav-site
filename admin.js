@@ -33,10 +33,15 @@ let loginModalShown = false;
 function showLoginModal(msg) {
   if (loginModalShown) return;
   loginModalShown = true;
+  loginChecked = false;
   document.getElementById('adminLoginModal').style.display = 'flex';
   document.getElementById('adminLoginMsg').textContent = msg || '';
   document.getElementById('adminLogoutBtn').style.display = 'none';
   document.getElementById('adminChangePwdShowBtn').style.display = 'none';
+  
+  // 清空输入框
+  document.getElementById('adminLoginUser').value = '';
+  document.getElementById('adminLoginPwd').value = '';
 }
 function hideLoginModal() {
   document.getElementById('adminLoginModal').style.display = 'none';
@@ -47,27 +52,60 @@ function hideLoginModal() {
 async function verifyToken() {
   const token = localStorage.getItem('adminToken');
   if (!token) return false;
+  
   try {
     const resp = await fetch('/api/admin-verify-token', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token }
     });
-    if (resp.status === 401) return false;
-    return true;
-  } catch (e) { return false; }
+    
+    if (resp.status === 401) {
+      // token无效，清除它
+      localStorage.removeItem('adminToken');
+      return false;
+    }
+    
+    if (resp.ok) {
+      return true;
+    }
+    
+    return false;
+  } catch (e) { 
+    console.error('Token验证网络错误:', e);
+    return false; 
+  }
 }
 
 // 自动重试ensureLogin
-async function ensureLogin(maxRetry = 3, retryInterval = 500) {
+async function ensureLogin(maxRetry = 3, retryInterval = 300) {
   if (loginChecked) return true;
-  for (let i = 0; i < maxRetry; i++) {
-    if (await verifyToken()) {
-      loginChecked = true;
-      hideLoginModal();
-      return true;
-    }
-    await new Promise(r => setTimeout(r, retryInterval));
+  
+  // 先检查是否有token
+  const token = localStorage.getItem('adminToken');
+  if (!token) {
+    showLoginModal();
+    return false;
   }
+  
+  for (let i = 0; i < maxRetry; i++) {
+    try {
+      if (await verifyToken()) {
+        loginChecked = true;
+        hideLoginModal();
+        return true;
+      }
+    } catch (error) {
+      console.error('Token验证失败:', error);
+    }
+    
+    // 最后一次重试失败后不再等待
+    if (i < maxRetry - 1) {
+      await new Promise(r => setTimeout(r, retryInterval));
+    }
+  }
+  
+  // 所有重试都失败，清除无效token
+  localStorage.removeItem('adminToken');
   showLoginModal();
   return false;
 }
@@ -91,11 +129,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = await resp.json();
     if (resp.ok && data.token) {
       localStorage.setItem('adminToken', data.token);
-      loginChecked = false;
+      // 设置登录状态为已检查，避免重复验证
+      loginChecked = true;
       hideLoginModal();
-      setTimeout(() => { location.reload(); }, 1200);
+      // 延长等待时间，确保token保存完成
+      setTimeout(() => { location.reload(); }, 800);
     } else {
       msgEl.textContent = data.msg || '登录失败';
+    }
+  };
+
+  document.getElementById('adminLoginCancelBtn').onclick = function () {
+    // 返回上一个页面
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // 如果没有历史记录，返回首页
+      window.location.href = '/';
     }
   };
 
@@ -107,9 +157,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isLoggingOut) return;
     isLoggingOut = true;
     document.getElementById('adminLogoutConfirmModal').style.display = 'none';
+    
+    // 清除登录状态
     localStorage.removeItem('adminToken');
     loginChecked = false;
-    setTimeout(() => location.reload(), 500);
+    loginModalShown = false;
+    
+    // 立即重新加载页面
+    setTimeout(() => location.reload(), 100);
   };
 
   document.getElementById('adminLogoutCancelBtn').onclick = function () {
@@ -171,10 +226,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ========== 登录验证 ==========
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!await ensureLogin(3, 500)) return;
+  // 延迟一点执行，确保页面加载完成
+  await new Promise(r => setTimeout(r, 100));
+  
+  if (!await ensureLogin(3, 300)) return;
+  
+  // 登录成功，显示后台功能
   document.getElementById('adminLogoutBtn').style.display = '';
   document.getElementById('adminChangePwdShowBtn').style.display = '';
   window.adminToken = localStorage.getItem('adminToken');
+  
+  // 初始化页面状态
   document.querySelectorAll('.admin-sidebar-item').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
 });

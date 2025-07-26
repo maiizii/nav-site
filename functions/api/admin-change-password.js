@@ -39,22 +39,45 @@ export async function onRequestPost(context) {
 
 // 简单 JWT 验证函数
 async function verifyJWT(token, secret) {
-  const [headerB64, payloadB64, signatureB64] = token.split('.');
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
-  );
-  const valid = await crypto.subtle.verify(
-    "HMAC",
-    key,
-    Uint8Array.from(atob(signatureB64), c => c.charCodeAt(0)),
-    new TextEncoder().encode(headerB64 + "." + payloadB64)
-  );
-  if (!valid) return null;
-  const payload = JSON.parse(atob(payloadB64));
-  if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
-  return payload;
+  try {
+    const [headerB64, payloadB64, signatureB64] = token.split('.');
+    if (!headerB64 || !payloadB64 || !signatureB64) return null;
+    
+    // 添加 base64url 填充处理
+    const addPadding = (str) => {
+      while (str.length % 4) {
+        str += '=';
+      }
+      return str;
+    };
+    
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign", "verify"]
+    );
+    
+    // 使用带填充的 base64url 解码
+    const signaturePadded = addPadding(signatureB64);
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      Uint8Array.from(atob(signaturePadded), c => c.charCodeAt(0)),
+      new TextEncoder().encode(headerB64 + "." + payloadB64)
+    );
+    
+    if (!valid) return null;
+    
+    // 使用带填充的 base64url 解码载荷
+    const payloadPadded = addPadding(payloadB64);
+    const payload = JSON.parse(atob(payloadPadded));
+    
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch (error) {
+    console.error('JWT 验证错误:', error);
+    return null;
+  }
 }
