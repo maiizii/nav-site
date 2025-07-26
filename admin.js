@@ -530,29 +530,49 @@ function renderNavTable(list) {
   }
 
   document.getElementById('add-btn').onclick = async () => {
-    // 获取当前列表的最大排序值
-    const currentItems = document.querySelectorAll('#nav-tbody tr');
-    const maxSort = currentItems.length > 0 ? currentItems.length : 0;
+    // 验证必填字段
+    const title = document.getElementById('add-title').value.trim();
+    const url = document.getElementById('add-url').value.trim();
+    if (!title || !url) {
+      alert('请填写网站名称和链接');
+      return;
+    }
+    
+    // 获取当前所有数据的最大排序值
+    const res = await fetchWithAuth(API);
+    const json = await res.json();
+    const allLinks = json.data || [];
+    const maxSort = allLinks.length > 0 ? Math.max(...allLinks.map(link => link.sort || 0)) : 0;
     
     const payload = {
-      title: document.getElementById('add-title').value,
-      url: document.getElementById('add-url').value,
+      title: title,
+      url: url,
       category_id: document.getElementById('add-category').value,
-      description: document.getElementById('add-description').value,
-      icon: document.getElementById('add-icon').value,
+      description: document.getElementById('add-description').value.trim(),
+      icon: document.getElementById('add-icon').value.trim(),
       sort: maxSort + 1 // 排在最下面
     };
-    await fetchWithAuth(ADD_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    document.getElementById('add-title').value = '';
-    document.getElementById('add-url').value = '';
-    document.getElementById('add-category').value = allCategories.length ? allCategories[0].id : '';
-    document.getElementById('add-description').value = '';
-    document.getElementById('add-icon').value = '';
-    loadNavLinks(); // 新增后需要重新加载以显示新项目
+    
+    try {
+      await fetchWithAuth(ADD_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      // 清空表单
+      document.getElementById('add-title').value = '';
+      document.getElementById('add-url').value = '';
+      document.getElementById('add-category').value = allCategories.length ? allCategories[0].id : '';
+      document.getElementById('add-description').value = '';
+      document.getElementById('add-icon').value = '';
+      
+      // 重新加载列表
+      loadNavLinks();
+    } catch (error) {
+      console.error('新增失败:', error);
+      alert('新增失败，请重试');
+    }
   };
 }
 
