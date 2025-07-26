@@ -11,41 +11,35 @@
   <header class="tk-header">
     <div class="tk-header-inner">
       <div class="tk-logo">
-        <a href="https://www.tkcall.com" style="text-decoration:none;">
+        <a href="https://www.tkcall.com" class="logo-link">
           <img class="logo-img" src="/tkcall_logo.png" alt="logo" />
         </a>
         <span class="site-nav-title">网站导航</span>
       </div>
-      <!-- 菜单折叠按钮 -->
-      <button class="menu-toggle" id="menu-toggle-btn" aria-label="展开菜单">
-        ☰
-      </button>
-      <div class="tk-menu-wrapper">
-        <nav class="tk-menu" id="tk-menu">
-          <a class="tk-menu-link" href="https://www.tkcall.com/c/general/4">日常</a>
-          <a class="tk-menu-link" href="https://www.tkcall.com/c/operation/6">运营</a>
-          <a class="tk-menu-link" href="https://www.tkcall.com/c/technology/7">技术</a>
-          <a class="tk-menu-link" href="https://www.tkcall.com/c/e-commerce/11">电商</a>
-          <a class="tk-menu-link" href="https://www.tkcall.com/c/advertisement/9">推广</a>
-          <a class="tk-menu-link" href="https://www.tkcall.com/c/trade/8">交易</a>
-        </nav>
-      </div>
+      <nav class="tk-menu" aria-label="主导航">
+        <a class="tk-menu-link" href="https://www.tkcall.com/c/general/4">日常</a>
+        <a class="tk-menu-link" href="https://www.tkcall.com/c/operation/6">运营</a>
+        <a class="tk-menu-link" href="https://www.tkcall.com/c/technology/7">技术</a>
+        <a class="tk-menu-link" href="https://www.tkcall.com/c/e-commerce/11">电商</a>
+        <a class="tk-menu-link" href="https://www.tkcall.com/c/advertisement/9">推广</a>
+        <a class="tk-menu-link" href="https://www.tkcall.com/c/trade/8">交易</a>
+      </nav>
       <div class="header-actions">
-        <div class="search-bar">
-          <input id="search" type="text" placeholder="搜索..." />
-        </div>
-        <a href="https://www.tkcall.com/t/topic/210" class="header-btn" id="settings-btn" style="margin-left:auto;">网站推荐</a>
+        <form class="search-bar" role="search" aria-label="站内搜索" onsubmit="return false;">
+          <input id="search" type="text" placeholder="搜索..." autocomplete="off" />
+        </form>
+        <a href="admin" class="header-btn" id="settings-btn">设置</a>
       </div>
     </div>
   </header>
-  <div class="container">
-    <aside class="sidebar">
+  <main class="container">
+    <aside class="sidebar" aria-label="分类导航">
       <div class="sidebar-categories-label">分类</div>
-      <div id="category-list" class="category-list"></div>
-      <button class="sidebar-top-btn" id="sidebar-top-btn">TOP</button>
+      <nav id="category-list" class="category-list"></nav>
+      <button class="sidebar-top-btn" id="sidebar-top-btn" type="button">TOP</button>
     </aside>
     <section class="main-content" id="main"></section>
-  </div>
+  </main>
   <footer>
     <p>© 2025 TK客网站导航</p>
   </footer>
