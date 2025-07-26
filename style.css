@@ -22,6 +22,90 @@ body {
 }
 
 /* =================== 首页头部 =================== */
+/* 移动端适配样式 */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+  }
+  .tk-header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 5px;
+  }
+  .tk-logo {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+  .site-nav-title {
+    font-size: 20px;
+    margin-left: 8px;
+  }
+  .tk-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .tk-menu-link {
+    font-size: 16px;
+    padding: 6px 10px;
+    flex: 1 1 40%;
+    text-align: center;
+  }
+  .header-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .search-bar {
+    flex: 1;
+    margin-right: 10px;
+  }
+  #search {
+    width: 100%;
+    font-size: 16px;
+    padding: 6px 10px;
+    box-sizing: border-box;
+  }
+  #settings-btn {
+    font-size: 16px;
+    padding: 6px 12px;
+    margin-left: 0;
+  }
+  .container {
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+    padding: 0;
+  }
+  .sidebar {
+    width: 100%;
+    margin-bottom: 15px;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+  }
+  .main-content {
+    width: 100%;
+    min-width: 0;
+    padding: 0 5px;
+  }
+  .sidebar-top-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+  footer {
+    font-size: 14px;
+    padding: 10px 0;
+    text-align: center;
+  }
+}
 .tk-header {
   background: rgba(255,255,255,0.18);
   box-shadow: 0 2px 8px 0 rgba(60,62,68,0.10);
@@ -73,27 +157,6 @@ body {
   position: relative;
   top: -1px;
   letter-spacing: 0.5px;
-}
-
-/* 菜单折叠按钮 */
-.menu-toggle {
-  display: none;
-  background: #88af8e;
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  font-size: 1.8em;
-  width: 44px;
-  height: 44px;
-  cursor: pointer;
-  margin-right: 8px;
-  align-self: flex-end;
-  z-index: 50;
-}
-
-.tk-menu-wrapper {
-  width: auto;
-  position: relative;
 }
 
 .tk-menu {
@@ -608,57 +671,7 @@ footer {
     padding: 10px 8px;
     gap: 8px;
   }
-  .menu-toggle {
-    display: block;
-  }
-  .tk-menu-wrapper {
-    width: 100%;
-    position: relative;
-  }
-  .tk-menu {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 45px;
-    left: 0;
-    right: 0;
-    background: #fff;
-    z-index: 40;
-    border-radius: 0 0 14px 14px;
-    box-shadow: 0 8px 28px 0 rgba(60,62,68,0.18), 0 1.5px 14px rgba(60,62,68,0.13);
-    padding: 10px 0;
-  }
-  .tk-menu.menu-open {
-    display: flex;
-  }
-  .tk-menu-link {
-    height: 38px;
-    line-height: 38px;
-    font-size: 1.1em;
-    border-radius: 7px;
-    padding: 0 14px;
-    margin: 6px 0;
-  }
-  .search-bar {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-    margin-left: 0;
-    margin-top: 8px;
-    padding: 0 4px;
-  }
-  .search-bar input {
-    font-size: 1em;
-    padding: 10px 13px;
-    border-radius: 10px;
-  }
-  .header-actions {
-    flex-direction: column;
-    align-items: stretch;
-    min-width: 0;
-    width: 100%;
-    gap: 8px;
-  }
+  .tk-menu-link { font-size: 14px; }
   .sidebar {
     padding: 8px 0;
     gap: 4px;
