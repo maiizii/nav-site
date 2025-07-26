@@ -1,3 +1,40 @@
+// 移动端分类菜单交互
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('mobile-category-btn');
+  var menu = document.getElementById('mobile-category-menu');
+  var closeBtn = document.getElementById('mobile-category-close');
+  var list = document.getElementById('category-list');
+  var mobileList = document.getElementById('mobile-category-list');
+
+  // 仅在移动端显示按钮
+  function updateMenuBtnDisplay() {
+    if (window.innerWidth <= 600) {
+      btn.style.display = 'block';
+    } else {
+      btn.style.display = 'none';
+      menu.style.display = 'none';
+    }
+  }
+  updateMenuBtnDisplay();
+  window.addEventListener('resize', updateMenuBtnDisplay);
+
+  // 打开菜单
+  btn.addEventListener('click', function() {
+    menu.style.display = 'block';
+    // 同步分类内容
+    if (list && mobileList) {
+      mobileList.innerHTML = list.innerHTML;
+    }
+  });
+  // 关闭菜单
+  closeBtn.addEventListener('click', function() {
+    menu.style.display = 'none';
+  });
+  // 点击菜单外部关闭
+  menu.addEventListener('click', function(e) {
+    if (e.target === menu) menu.style.display = 'none';
+  });
+});
 let allLinks = [];
 let allCategories = [];
 let currentCategory = ''; // 当前选中的一级分类id
