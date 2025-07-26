@@ -5,9 +5,9 @@ export async function onRequest(context) {
     return new Response('Method Not Allowed', { status: 405 });
   }
   const body = await request.json();
-  const { title, url, category, category_id, description, icon } = body;
+  const { title, url, category, category_id, description, icon, sort } = body;
   await env.DB.prepare(
-    'INSERT INTO nav_links (title, url, category, category_id, description, icon) VALUES (?, ?, ?, ?, ?, ?)'
-  ).bind(title, url, category ?? null, category_id ?? null, description, icon).run();
+    'INSERT INTO nav_links (title, url, category, category_id, description, icon, sort) VALUES (?, ?, ?, ?, ?, ?, ?)'
+  ).bind(title, url, category ?? null, category_id ?? null, description, icon, sort ?? null).run();
   return Response.json({ ok: true });
 }
