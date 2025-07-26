@@ -53,7 +53,7 @@
   }
   .mobile-category-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1px;
     padding: 16px 4px;
     max-width: 100%;
