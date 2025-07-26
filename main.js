@@ -8,11 +8,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 仅在移动端显示按钮
   function updateMenuBtnDisplay() {
+    if (!btn) return; // 如果按钮不存在则返回
     if (window.innerWidth <= 600) {
       btn.style.display = 'block';
     } else {
       btn.style.display = 'none';
-      menu.style.display = 'none';
+      if (menu) menu.style.display = 'none';
     }
   }
   updateMenuBtnDisplay();
@@ -28,21 +29,27 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // 打开菜单
-  btn.addEventListener('click', function() {
-    menu.style.display = 'block';
-    // 同步分类内容
-    if (list && mobileList) {
-      mobileList.innerHTML = list.innerHTML;
-    }
-  });
+  if (btn && menu) {
+    btn.addEventListener('click', function() {
+      menu.style.display = 'block';
+      // 同步分类内容
+      if (list && mobileList) {
+        mobileList.innerHTML = list.innerHTML;
+      }
+    });
+  }
   // 关闭菜单
-  closeBtn.addEventListener('click', function() {
-    menu.style.display = 'none';
-  });
+  if (closeBtn && menu) {
+    closeBtn.addEventListener('click', function() {
+      menu.style.display = 'none';
+    });
+  }
   // 点击菜单外部关闭
-  menu.addEventListener('click', function(e) {
-    if (e.target === menu) menu.style.display = 'none';
-  });
+  if (menu) {
+    menu.addEventListener('click', function(e) {
+      if (e.target === menu) menu.style.display = 'none';
+    });
+  }
 });
 let allLinks = [];
 let allCategories = [];
