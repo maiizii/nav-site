@@ -1,0 +1,21 @@
+{
+  "name": "nav-site",
+  "version": "1.0.0",
+  "description": "A simple navigation site built with Cloudflare Pages and D1",
+  "main": "index.html",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy ."
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "keywords": [
+    "cloudflare",
+    "pages",
+    "d1",
+    "navigation"
+  ],
+  "author": "",
+  "license": "MIT"
+}
